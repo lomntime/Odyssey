@@ -1,3 +1,3 @@
-﻿public class WalkPlayerState
+﻿public class WalkPlayerState : PlayerState
 {
 }
