@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using UnityEditor;
+using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// 实体状态
@@ -6,32 +8,121 @@
 /// <typeparam name="T">实体派生类型</typeparam>
 public abstract class EntityState<T> where T : Entity<T>
 {
+    #region 外部接口
+
     /// <summary>
-    /// 使用实体状态类型名称创建对应实体状态实例
+    /// 进入状态
     /// </summary>
-    /// <param name="typeName">实体状态名称</param>
-    /// <returns></returns>
-    public static EntityState<T> CreateInsFromString(string typeName)
+    /// <param name="entity"></param>
+    public void Enter(T entity)
     {
-        var ins = System.Activator.CreateInstance(System.Type.GetType(typeName));
+        m_tiemSinceEnter = 0f;
         
-        return (EntityState<T>)ins;
+        EventOnEnter?.Invoke();
+        OnEnter(entity);
     }
 
     /// <summary>
-    /// 使用实体状态类型名称数组创建对应实体状态实例列表
+    /// 离开状态
     /// </summary>
-    /// <param name="typeNames">实体状态名称数组</param>
-    /// <returns></returns>
-    public static List<EntityState<T>> CreateInsListFromStringArray(string[] typeNames)
+    /// <param name="entity"></param>
+    public void Exit(T entity)
     {
-        var tempList = new List<EntityState<T>>();
+        EventOnExit?.Invoke();
+        OnExit(entity);
+    }
 
-        foreach (var typeName in typeNames)
+    /// <summary>
+    /// 保持状态，每帧调用
+    /// </summary>
+    /// <param name="entity"></param>
+    public void Step(T entity)
+    {
+        m_tiemSinceEnter += Time.deltaTime;
+        OnStep(entity);
+    }
+
+    /// <summary>
+    /// 碰撞检测逻辑
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="other"></param>
+    public void Contact(T entity, Collider other)
+    {
+        OnContact(entity, other);
+    }
+
+    #endregion
+
+    #region 内部函数
+
+    /// <summary>
+    /// 当实体进入状态
+    /// </summary>
+    /// <param name="entity"></param>
+    protected abstract void OnEnter(T entity);
+    
+    /// <summary>
+    /// 当实体离开状态
+    /// </summary>
+    /// <param name="entity"></param>
+    protected abstract void OnExit(T entity);
+    
+    /// <summary>
+    /// 当实体保持状态，每帧调用
+    /// </summary>
+    /// <param name="entity"></param>
+    protected abstract void OnStep(T entity);
+    
+    /// <summary>
+    /// 当实体碰撞时
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="other"></param>>
+    protected abstract void OnContact(T entity, Collider other);
+
+    #endregion
+    
+    #region 事件
+    
+    /// <summary>
+    /// 状态进入事件
+    /// </summary>
+    public UnityEvent EventOnEnter;
+
+    /// <summary>
+    /// 状态退出事件
+    /// </summary>
+    public UnityEvent EventOnExit;
+
+    /// <summary>
+    /// 状态保持事件
+    /// </summary>
+    public UnityEvent EventOnStep;
+
+    #endregion
+
+    #region 属性
+
+    /// <summary>
+    /// 实体计入当前状态后经过时间，单位:秒
+    /// </summary>
+    public float TimeScineEnter
+    {
+        get
         {
-            tempList.Add(CreateInsFromString(typeName));
+            return m_tiemSinceEnter;
         }
-        
-        return tempList;
     }
+
+    #endregion
+
+    #region 字段
+
+    /// <summary>
+    /// 实体计入当前状态后经过时间，单位:秒
+    /// </summary>
+    protected float m_tiemSinceEnter;
+
+    #endregion
 }

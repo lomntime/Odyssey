@@ -13,7 +13,7 @@ public class PlayerStateManager : EntityStateManager<Player>
     /// <inheritdoc />
     protected override List<EntityState<Player>> GetAllStates()
     {
-        return PlayerState.CreateInsListFromStringArray(m_stateNames);
+        return EntityStateHelper<Player>.CreateInsListFromStringArray(m_stateNames);
     }
 
     #endregion

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 
+/// 实体状态管理器
 /// </summary>
 public abstract class EntityStateManager : MonoBehaviour
 {
@@ -20,17 +20,37 @@ public abstract class EntityStateManager<T> : EntityStateManager where T : Entit
 
     private void Start()
     {
-        Ininialize();
+        InitializeEntity();
+        IninializeStateManager();
+    }
+
+    #endregion
+
+    #region 外部接口
+    public virtual void Step()
+    {
+        if (m_currState != null && Time.timeScale > 0)
+        {
+            m_currState.Step(m_entity);
+        }
     }
 
     #endregion
     
     #region 内部函数
+
+    /// <summary>
+    /// 初始化关联的实体实例
+    /// </summary>
+    protected virtual void InitializeEntity()
+    {
+        m_entity = GetComponent<T>();
+    }
     
     /// <summary>
     /// 初始化实体状态管理器
     /// </summary>
-    protected virtual void Ininialize()
+    protected virtual void IninializeStateManager()
     {
         m_states = new();
         m_stateDict = new();
@@ -58,10 +78,35 @@ public abstract class EntityStateManager<T> : EntityStateManager where T : Entit
     /// </summary>
     /// <returns></returns>
     protected abstract List<EntityState<T>> GetAllStates();
+    
+    #endregion
+
+    #region 属性
+
+    /// <summary>
+    /// 关联的实体实例
+    /// </summary>
+    public T Entity
+    {
+        get { return m_entity; }
+    }
+    
+    /// <summary>
+    /// 当前实体状态
+    /// </summary>
+    public EntityState<T> CurrentState
+    {
+        get { return m_currState; }
+    }
 
     #endregion
     
     #region 字段
+    
+    /// <summary>
+    /// 关联的实体实例
+    /// </summary>
+    protected T m_entity;
 
     /// <summary>
     /// 当前状态

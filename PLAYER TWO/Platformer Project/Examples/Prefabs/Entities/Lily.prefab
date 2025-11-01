@@ -2251,7 +2251,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92a84acd91dc4e2c9c9564652b798a5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStateManager
-  m_stateNames: []
+  m_stateNames:
+  - IdelPlayerState
+  - WalkPlayerState
 --- !u!1 &6670180705425501448
 GameObject:
   m_ObjectHideFlags: 0
