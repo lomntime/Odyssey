@@ -19,7 +19,9 @@ public class IdelPlayerState : PlayerState
     /// <inheritdoc/>
     protected override void OnStep(Player entity)
     {
-        Debug.Log($"IdelPlayerState::OnStep");
+        var direction = entity.InputManager.MovementDirectionGet();
+        
+        Debug.Log("IdelPlayerState::OnStep Direction: " + direction);
     }
 
     /// <inheritdoc/>

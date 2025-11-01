@@ -2197,8 +2197,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6650432633027884459}
-  - component: {fileID: 2563513727823947661}
+  - component: {fileID: 7564876671957351257}
   - component: {fileID: 5036882133438085499}
+  - component: {fileID: 2563513727823947661}
   m_Layer: 0
   m_Name: Lily
   m_TagString: Untagged
@@ -2227,7 +2228,7 @@ Transform:
   - {fileID: 494511523524256515}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2563513727823947661
+--- !u!114 &7564876671957351257
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2236,9 +2237,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 6650432633027884458}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6906775824a497bad27320efd3b94c0, type: 3}
+  m_Script: {fileID: 11500000, guid: d9e379718476498aa1ae26a901577622, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Player
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInputManager
+  m_inputAction: {fileID: -944628639613478452, guid: 6b99b82d3ff7bfd4199643130476cdf4,
+    type: 3}
+  m_movementDirectionUnlockTime: 0
 --- !u!114 &5036882133438085499
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2254,6 +2258,18 @@ MonoBehaviour:
   m_stateNames:
   - IdelPlayerState
   - WalkPlayerState
+--- !u!114 &2563513727823947661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6650432633027884458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6906775824a497bad27320efd3b94c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player
 --- !u!1 &6670180705425501448
 GameObject:
   m_ObjectHideFlags: 0
