@@ -29,4 +29,17 @@ public class WalkPlayerState : PlayerState
     }
 
     #endregion
+
+    #region 内部函数
+
+    /// <summary>
+    /// 获取相机视角下的玩家输入方向
+    /// </summary>
+    /// <returns></returns>
+    protected virtual Vector3 MovementCameraDirectionGet()
+    {
+        return Vector3.zero;
+    }
+
+    #endregion
 }
