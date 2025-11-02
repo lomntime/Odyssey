@@ -20,8 +20,12 @@ public class IdelPlayerState : PlayerState
     protected override void OnStep(Player entity)
     {
         var direction = entity.InputManager.MovementDirectionGet();
-        
-        Debug.Log("IdelPlayerState::OnStep Direction: " + direction);
+
+        // 存在方向和水平速度时切换到walk状态
+        if (direction.sqrMagnitude > 0 && entity.LateralVelocity.sqrMagnitude > 0)
+        {
+            
+        }
     }
 
     /// <inheritdoc/>

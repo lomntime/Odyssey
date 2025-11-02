@@ -7,7 +7,11 @@ using UnityEngine;
 /// </summary>
 public abstract class EntityStateManager : MonoBehaviour
 {
-    
+    /// <summary>
+    /// 实体状态管理器事件
+    /// </summary>
+    [Header("实体状态管理器事件")]
+    public EntityStateManagerEvents m_events;
 }
 
 /// <summary>
@@ -32,6 +36,42 @@ public abstract class EntityStateManager<T> : EntityStateManager where T : Entit
         if (m_currState != null && Time.timeScale > 0)
         {
             m_currState.Step(m_entity);
+        }
+    }
+
+    /// <summary>
+    /// 更改状态
+    /// </summary>
+    /// <typeparam name="TState"></typeparam>
+    public virtual void Change<TState>() where TState : EntityState<T>
+    {
+        var type = typeof(TState);
+
+        if (m_stateDict.ContainsKey(type))
+        {
+            Change(m_stateDict[type]);
+        }
+    }
+
+    /// <summary>
+    /// 更改状态
+    /// </summary>
+    /// <param name="state"></param>
+    public virtual void Change(EntityState<T> state)
+    {
+        if (state != null && Time.timeScale > 0)
+        {
+            if (m_currState != null)
+            {
+                m_currState.EventOnExit?.Invoke();
+                m_events.EventOnExit?.Invoke(m_currState.GetType());
+                m_prevState = m_currState;
+            }
+            
+            m_currState = state;
+            m_currState.EventOnEnter?.Invoke();
+            m_events.EventOnEnter?.Invoke(m_currState.GetType());
+            m_events.EventOnChange?.Invoke();
         }
     }
 
@@ -99,6 +139,14 @@ public abstract class EntityStateManager<T> : EntityStateManager where T : Entit
         get { return m_currState; }
     }
 
+    /// <summary>
+    /// 上一个状态
+    /// </summary>
+    public EntityState<T> PreviousState
+    {
+        get { return m_prevState; }
+    }
+
     #endregion
     
     #region 字段
@@ -112,6 +160,11 @@ public abstract class EntityStateManager<T> : EntityStateManager where T : Entit
     /// 当前状态
     /// </summary>
     protected EntityState<T> m_currState;
+    
+    /// <summary>
+    /// 上一个状态
+    /// </summary>
+    protected EntityState<T> m_prevState;
 
     /// <summary>
     /// 状态集合

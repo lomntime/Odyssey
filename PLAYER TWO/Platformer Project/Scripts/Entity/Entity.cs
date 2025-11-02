@@ -43,6 +43,24 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     /// </summary>
     public EntityStateManager StateManager => m_stateManager;
 
+    /// <summary>
+    /// 水平速度
+    /// </summary>
+    public Vector3 LateralVelocity
+    {
+        get { return new Vector3(m_velocity.x, 0f, m_velocity.z); }
+        set { m_velocity = new Vector3(value.x, m_velocity.y, value.z); }
+    }
+
+    /// <summary>
+    /// 垂直速度
+    /// </summary>
+    public Vector3 VerticalVelocity
+    {
+        get { return new Vector3(0f, m_velocity.y, 0f); }
+        set { m_velocity = new Vector3(m_velocity.x, value.y, m_velocity.z); }
+    }
+
     #endregion
     
     #region 字段
@@ -51,6 +69,11 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     /// 实体状态管理器
     /// </summary>
     protected EntityStateManager<T> m_stateManager;
+
+    /// <summary>
+    /// 速度
+    /// </summary>
+    protected Vector3 m_velocity;
 
     #endregion
 }
