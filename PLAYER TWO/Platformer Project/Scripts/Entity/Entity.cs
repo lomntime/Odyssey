@@ -41,7 +41,7 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     /// <summary>
     /// 实体状态管理器
     /// </summary>
-    public EntityStateManager StateManager => m_stateManager;
+    public EntityStateManager<T> StateManager => m_stateManager;
 
     /// <summary>
     /// 水平速度
