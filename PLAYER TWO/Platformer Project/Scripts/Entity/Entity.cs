@@ -13,7 +13,42 @@ public abstract class EntityBase : MonoBehaviour
 /// <typeparam name="T"></typeparam>
 public abstract class Entity<T> : EntityBase where T : Entity<T>
 {
+    #region 外部接口
 
+    /// <summary>
+    /// 平滑移动实体
+    /// </summary>
+    /// <param name="direction"></param>
+    /// <param name="turningDrag"></param>
+    /// <param name="acceleration"></param>
+    /// <param name="topSpeed"></param>
+    public virtual void Accelerate(Vector3 direction, float turningDrag, float acceleration, float topSpeed)
+    {
+        if (direction.sqrMagnitude <= 0)
+        {
+            return;
+        }
+
+        var speed = Vector3.Dot(direction, LateralVelocity);
+        var velocity = speed * direction;
+        var turningVelocity = LateralVelocity -  velocity;
+        var turningDelta = turningDrag * m_turningDragMultiplier  * Time.deltaTime;
+        var targetSpeed = topSpeed * m_topSpeedMultiplier;
+
+        if (LateralVelocity.sqrMagnitude < targetSpeed || speed < 0)
+        {
+            speed += acceleration * m_accelerationMultiplier * Time.deltaTime;
+            speed = Mathf.Clamp(speed, -targetSpeed, targetSpeed);
+        }
+
+        velocity = direction * speed;
+        turningVelocity = Vector3.MoveTowards(turningVelocity, Vector3.zero, turningDelta);
+        LateralVelocity = velocity + turningVelocity;
+
+    }
+
+    #endregion
+    
     #region 生命周期
 
     protected virtual void Awake()
@@ -26,6 +61,7 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
         if(m_stateManager == null || Time.timeScale <= 0) return;
         
         HandleState();
+        HandleController();
     }
 
     #endregion
@@ -33,6 +69,14 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     #region 内部函数
 
     protected virtual void HandleState() => m_stateManager.Step();
+
+    /// <summary>
+    /// 处理角色移动
+    /// </summary>
+    protected virtual void HandleController()
+    {
+        transform.position += m_velocity * Time.deltaTime;
+    }
 
     #endregion
     
@@ -61,6 +105,52 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
         set { m_velocity = new Vector3(m_velocity.x, value.y, m_velocity.z); }
     }
 
+    /// <summary>
+    /// 加速度倍率
+    /// </summary>
+    public float AccelerationMultiplier
+    {
+        get => m_accelerationMultiplier; 
+        set => m_accelerationMultiplier = value;
+    }
+
+    /// <summary>
+    /// 重力倍率
+    /// </summary>
+    public float GravityMultiplier
+    {
+        get => m_gravityMultiplier;
+        set => m_gravityMultiplier = value;
+    }
+
+    /// <summary>
+    /// 最高速度倍率
+    /// </summary>
+    public float TopSpeedMultiplier
+    {
+        get => m_topSpeedMultiplier;
+        set => m_topSpeedMultiplier = value;
+    }
+
+    /// <summary>
+    /// 转向阻力倍率
+    /// </summary>
+    public float TurningDragMultiplier
+    {
+        get => m_turningDragMultiplier;
+        set => m_turningDragMultiplier = value;
+    }
+
+    /// <summary>
+    /// 减速度倍率
+    /// 减速度倍率
+    /// </summary>
+    public float DecelerationMultiplier
+    {
+        get => m_decelerationMultiplier;
+        set => m_decelerationMultiplier = value;
+    }
+
     #endregion
     
     #region 字段
@@ -74,6 +164,31 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     /// 速度
     /// </summary>
     protected Vector3 m_velocity;
+    
+    /// <summary>
+    /// 加速度倍率
+    /// </summary>
+    protected float m_accelerationMultiplier = 1f;
+    
+    /// <summary>
+    /// 重力倍率
+    /// </summary>
+    protected float m_gravityMultiplier = 1f;
+    
+    /// <summary>
+    /// 最高速度倍率
+    /// </summary>
+    protected float m_topSpeedMultiplier = 1f;
+    
+    /// <summary>
+    /// 转向阻力倍率
+    /// </summary>
+    protected float m_turningDragMultiplier = 1f;
+    
+    /// <summary>
+    /// 减速度倍率
+    /// </summary>
+    protected float m_decelerationMultiplier = 1f;
 
     #endregion
 }
