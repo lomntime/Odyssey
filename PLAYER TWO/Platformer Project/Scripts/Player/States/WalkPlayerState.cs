@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// 玩家移动状态
+/// </summary>
 public class WalkPlayerState : PlayerState
 {
     #region override of EntityState
@@ -19,26 +22,24 @@ public class WalkPlayerState : PlayerState
     /// <inheritdoc/>
     protected override void OnStep(Player entity)
     {
-        throw new System.NotImplementedException();
+        var direction = entity.InputManager.MovementCameraDirectionGet();
+
+        if (direction.sqrMagnitude > 0)
+        {
+            var dot = Vector3.Dot(direction, entity.LateralVelocity);
+
+            if (dot > entity.StatsManager.CurrStats.m_brakeThreshold)
+            {
+                entity.Accelerate(direction);
+                entity.FaceDirectionSmooth(direction);
+            }
+        }
     }
 
     /// <inheritdoc/>
     protected override void OnContact(Player entity, Collider collider)
     {
         throw new System.NotImplementedException();
-    }
-
-    #endregion
-
-    #region 内部函数
-
-    /// <summary>
-    /// 获取相机视角下的玩家输入方向
-    /// </summary>
-    /// <returns></returns>
-    protected virtual Vector3 MovementCameraDirectionGet()
-    {
-        return Vector3.zero;
     }
 
     #endregion

@@ -29,6 +29,26 @@ public class PlayerInputManager : MonoBehaviour
         var value = m_movement.ReadValue<Vector2>();
         return AxisWithCrossDeadZone(value);
     }
+
+    /// <summary>
+    /// 获取玩家视角相机下的移动方向
+    /// </summary>
+    /// <returns>玩家相机视角下的归一化后的移动方向</returns>
+    public virtual Vector3 MovementCameraDirectionGet()
+    {
+        var direction = MovementDirectionGet();
+
+        if (direction.sqrMagnitude > 0)
+        {
+            var rotation = Quaternion.AngleAxis(m_camera.transform.eulerAngles.y, Vector3.up);
+            
+            direction = rotation * direction;
+
+            direction = direction.normalized;
+        }
+
+        return direction;
+    }
     
     #endregion
 
@@ -39,6 +59,8 @@ public class PlayerInputManager : MonoBehaviour
     /// </summary>
     protected virtual void CacheAction()
     {
+        m_camera = Camera.main;
+        
         m_movement = m_inputAction.FindAction(MovementActionName);
     }
 
@@ -75,6 +97,11 @@ public class PlayerInputManager : MonoBehaviour
     /// 移动
     /// </summary>
     protected InputAction m_movement;
+    
+    /// <summary>
+    /// 玩家视角相机相
+    /// </summary>
+    protected Camera m_camera;
 
     /// <summary>
     /// InputAction资产
@@ -92,6 +119,9 @@ public class PlayerInputManager : MonoBehaviour
 
     #region 常量
 
+    /// <summary>
+    /// 移动Action名称
+    /// </summary>
     protected const string MovementActionName = "Movement";
 
     #endregion
