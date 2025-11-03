@@ -22,9 +22,9 @@ public class IdelPlayerState : PlayerState
         var direction = entity.InputManager.MovementDirectionGet();
 
         // 存在方向和水平速度时切换到walk状态
-        if (direction.sqrMagnitude > 0 && entity.LateralVelocity.sqrMagnitude > 0)
+        if (direction.sqrMagnitude > 0  || entity.LateralVelocity.sqrMagnitude > 0)
         {
-            
+            entity.StateManager.Change<WalkPlayerState>();
         }
     }
 
