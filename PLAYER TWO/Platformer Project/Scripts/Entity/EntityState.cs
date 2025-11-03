@@ -106,7 +106,7 @@ public abstract class EntityState<T> where T : Entity<T>
     /// <summary>
     /// 实体计入当前状态后经过时间，单位:秒
     /// </summary>
-    public float TimeScineEnter
+    public float TimeSinceEnter
     {
         get
         {

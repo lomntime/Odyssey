@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// 玩家空闲状态
+/// </summary>
 public class IdelPlayerState : PlayerState
 {
     #region override of EntityState

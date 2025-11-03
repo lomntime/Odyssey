@@ -20,6 +20,9 @@ public class PlayerStateManager : EntityStateManager<Player>
     
     #region 字段
     
+    /// <summary>
+    /// 状态名称集合
+    /// </summary>
     [ClassTypeName(typeof(PlayerState))]
     public string[] m_stateNames;
     

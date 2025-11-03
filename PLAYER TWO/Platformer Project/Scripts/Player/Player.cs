@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// 玩家实体
+/// </summary>
 public class Player : Entity<Player>
 {
     #region 外部接口

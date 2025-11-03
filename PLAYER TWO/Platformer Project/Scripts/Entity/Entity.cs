@@ -86,6 +86,9 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
 
     #region 内部函数
 
+    /// <summary>
+    /// 驱动状态执行
+    /// </summary>
     protected virtual void HandleState() => m_stateManager.Step();
 
     /// <summary>
@@ -160,7 +163,6 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     }
 
     /// <summary>
-    /// 减速度倍率
     /// 减速度倍率
     /// </summary>
     public float DecelerationMultiplier

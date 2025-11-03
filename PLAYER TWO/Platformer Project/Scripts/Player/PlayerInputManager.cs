@@ -119,6 +119,9 @@ public class PlayerInputManager : MonoBehaviour
 
     #region 常量
 
+    /// <summary>
+    /// 移动Action名称
+    /// </summary>
     protected const string MovementActionName = "Movement";
 
     #endregion

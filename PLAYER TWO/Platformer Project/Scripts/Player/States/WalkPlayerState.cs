@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// 玩家移动状态
+/// </summary>
 public class WalkPlayerState : PlayerState
 {
     #region override of EntityState
