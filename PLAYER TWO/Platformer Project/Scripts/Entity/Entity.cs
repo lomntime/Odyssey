@@ -47,6 +47,24 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
 
     }
 
+    /// <summary>
+    /// 实体旋转到指定方向
+    /// </summary>
+    /// <param name="direction"></param>
+    /// <param name="degreesPerSecond"></param>
+    public virtual void FaceDirection(Vector3 direction, float degreesPerSecond)
+    {
+        if (direction == Vector3.zero)
+        {
+            return;
+        }
+        
+        var rotation = transform.rotation;
+        var rotationDetail = degreesPerSecond * Time.deltaTime;
+        var target = Quaternion.LookRotation(direction,  Vector3.up);
+        transform.rotation = Quaternion.RotateTowards(rotation, target, rotationDetail);
+    }
+
     #endregion
     
     #region 生命周期

@@ -28,6 +28,7 @@ public class WalkPlayerState : PlayerState
             if (dot > entity.StatsManager.CurrStats.m_brakeThreshold)
             {
                 entity.Accelerate(direction);
+                entity.FaceDirectionSmooth(direction);
             }
         }
     }

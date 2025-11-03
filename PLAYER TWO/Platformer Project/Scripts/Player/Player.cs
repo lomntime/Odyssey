@@ -18,6 +18,12 @@ public class Player : Entity<Player>
         Accelerate(direction, finalAcceleration, turningDrag, topSpeed);
     }
 
+    /// <summary>
+    /// 玩家角色平滑朝向移动方向
+    /// </summary>
+    /// <param name="direction"></param>
+    public virtual void FaceDirectionSmooth(Vector3 direction) => FaceDirection(direction, m_statsManager.CurrStats.rotationSpeed);
+    
     #endregion    
     
     #region Override of Entity
