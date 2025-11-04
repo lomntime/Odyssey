@@ -49,6 +49,36 @@ public class PlayerInputManager : MonoBehaviour
 
         return direction;
     }
+
+    /// <summary>
+    /// 获取玩家观察方向
+    /// </summary>
+    /// <returns></returns>
+    public virtual Vector3 LookDirectionGet()
+    {
+        var val = m_look.ReadValue<Vector2>();
+
+        if (IsLookingWithMouse())
+        {
+            return new  Vector3(val.x, 0f, val.y);
+        }
+        
+        return AxisWithCrossDeadZone(val);
+    }
+    
+    /// <summary>
+    /// 是否使用使用鼠标设备控制观察视角
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool IsLookingWithMouse()
+    {
+        if (m_look == null)
+        {
+            return false;
+        }
+        
+        return m_look.activeControl.device.name.Equals(MouseDeviceName);
+    }
     
     #endregion
 
@@ -60,8 +90,9 @@ public class PlayerInputManager : MonoBehaviour
     protected virtual void CacheAction()
     {
         m_camera = Camera.main;
-        
+
         m_movement = m_inputAction.FindAction(MovementActionName);
+        m_look = m_inputAction.FindAction(LookActionName);
     }
 
     /// <summary>
@@ -89,6 +120,7 @@ public class PlayerInputManager : MonoBehaviour
         return (value - (value > 0 ? -deadZone : deadZone)) / (1 - deadZone);
     }
 
+
     #endregion
     
     #region 字段
@@ -97,6 +129,11 @@ public class PlayerInputManager : MonoBehaviour
     /// 移动
     /// </summary>
     protected InputAction m_movement;
+
+    /// <summary>
+    /// 玩家观察方向
+    /// </summary>
+    protected InputAction m_look;
     
     /// <summary>
     /// 玩家视角相机相
@@ -123,6 +160,16 @@ public class PlayerInputManager : MonoBehaviour
     /// 移动Action名称
     /// </summary>
     protected const string MovementActionName = "Movement";
+    
+    /// <summary>
+    /// 玩家观察方向Action名称
+    /// </summary>
+    protected const string LookActionName = "Look";
+    
+    /// <summary>
+    /// 鼠标设备名称
+    /// </summary>
+    protected const string MouseDeviceName = "Mouse";
 
     #endregion
 }
