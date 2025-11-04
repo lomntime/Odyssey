@@ -147,6 +147,22 @@ public abstract class EntityStateManager<T> : EntityStateManager where T : Entit
         get { return m_prevState; }
     }
 
+    /// <summary>
+    /// 当前状态在列表中的索引
+    /// </summary>
+    public int CurrIndex
+    {
+        get { return m_states.IndexOf(m_currState); }
+    }
+
+    /// <summary>
+    /// 上一个状态在列表中的索引
+    /// </summary>
+    public int PrevIndex
+    {
+        get { return m_states.IndexOf(m_prevState); }
+    }
+
     #endregion
     
     #region 字段
