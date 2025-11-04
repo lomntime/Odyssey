@@ -2200,6 +2200,7 @@ GameObject:
   - component: {fileID: 7564876671957351257}
   - component: {fileID: 5036882133438085499}
   - component: {fileID: 9077142813939134806}
+  - component: {fileID: 2821077794718788505}
   - component: {fileID: 2563513727823947661}
   m_Layer: 0
   m_Name: Lily
@@ -2283,6 +2284,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStatsManager
   m_stats:
   - {fileID: 11400000, guid: 00bcb4afab4c5b64b839b19378747f53, type: 2}
+--- !u!114 &2821077794718788505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6650432633027884458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4792c10453144e62a6fd3a85b9021c81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimator
+  m_animator: {fileID: 301645532738941841}
+  stateName: State
+  lastStateName: Last State
+  lateralSpeedName: Lateral Speed
+  verticalSpeedName: Vertical Speed
+  lateralAnimationSpeedName: Lateral Animation Speed
+  healthName: Health
+  jumpCounterName: Jump Counter
+  isGroundedName: Is Grounded
+  isHoldingName: Is Holding
+  onStateChangedName: On State Changed
+  minLateralAnimationSpeed: 0.5
+  m_forcedTransitionList:
+  - fromStateId: 15
+    animationLayer: 0
+    toAnimationState: Idle
 --- !u!114 &2563513727823947661
 MonoBehaviour:
   m_ObjectHideFlags: 0

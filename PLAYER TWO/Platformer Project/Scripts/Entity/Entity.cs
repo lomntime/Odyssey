@@ -5,6 +5,12 @@ using UnityEngine;
 /// </summary>
 public abstract class EntityBase : MonoBehaviour
 {
+    public Vector3 UnsizedPosition => transform.position;
+
+    /// <summary>
+    /// 实体是否处于地面
+    /// </summary>
+    public bool IsGrounded { get; set; } = true;
 }
 
 /// <summary>
@@ -107,6 +113,15 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     /// 实体状态管理器
     /// </summary>
     public EntityStateManager<T> StateManager => m_stateManager;
+
+    /// <summary>
+    /// 速度
+    /// </summary>
+    public Vector3 Velocity
+    {
+        get => m_velocity;
+        set => m_velocity = value;
+    }
 
     /// <summary>
     /// 水平速度
