@@ -2270,6 +2270,7 @@ MonoBehaviour:
   m_stateNames:
   - IdelPlayerState
   - WalkPlayerState
+  - BrakePlayerState
 --- !u!114 &9077142813939134806
 MonoBehaviour:
   m_ObjectHideFlags: 0
