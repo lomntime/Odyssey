@@ -22,6 +22,8 @@ public class WalkPlayerState : PlayerState
     /// <inheritdoc/>
     protected override void OnStep(Player entity)
     {
+        entity.Gravity();
+        
         var direction = entity.InputManager.MovementCameraDirectionGet();
 
         if (direction.sqrMagnitude > 0)

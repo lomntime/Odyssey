@@ -22,6 +22,8 @@ public class IdelPlayerState : PlayerState
     /// <inheritdoc/>
     protected override void OnStep(Player entity)
     {
+        entity.Gravity();
+        
         var direction = entity.InputManager.MovementDirectionGet();
 
         // 存在方向和水平速度时切换到walk状态
