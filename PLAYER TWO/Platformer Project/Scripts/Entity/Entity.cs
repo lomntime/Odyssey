@@ -5,12 +5,20 @@ using UnityEngine;
 /// </summary>
 public abstract class EntityBase : MonoBehaviour
 {
-    public Vector3 UnsizedPosition => transform.position;
+    #region 属性
+    public virtual Vector3 UnsizedPosition => transform.position;
 
     /// <summary>
     /// 实体是否处于地面
     /// </summary>
-    public bool IsGrounded { get; set; } = true;
+    public virtual bool IsGrounded { get; set; } = true;
+    
+    /// <summary>
+    /// 实体是否处于斜坡上
+    /// </summary>
+    public virtual bool IsOnSlopingGround { get; protected set; } = false;
+
+    #endregion
 }
 
 /// <summary>
@@ -71,6 +79,16 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
         transform.rotation = Quaternion.RotateTowards(rotation, target, rotationDetail);
     }
 
+    /// <summary>
+    /// 平滑减速
+    /// </summary>
+    /// <param name="deceleration"></param>
+    public virtual void Decelerate(float deceleration)
+    {
+        var delta =  deceleration * m_decelerationMultiplier * Time.deltaTime;
+        LateralVelocity = Vector3.MoveTowards(LateralVelocity, Vector3.zero, delta);
+    }
+    
     #endregion
     
     #region 生命周期

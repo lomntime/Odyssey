@@ -27,6 +27,26 @@ public class Player : Entity<Player>
     /// <param name="direction"></param>
     public virtual void FaceDirectionSmooth(Vector3 direction) => FaceDirection(direction, m_statsManager.CurrStats.rotationSpeed);
     
+    /// <summary>
+    /// 平滑减速，使用减速度
+    /// </summary>
+    public virtual void Decelerate() => Decelerate(m_statsManager.CurrStats.m_deceleration);
+    
+    /// <summary>
+    /// 平滑减速，使用摩擦力
+    /// </summary>
+    public virtual void Friction()
+    {
+        if (IsOnSlopingGround)
+        {
+            Decelerate(m_statsManager.CurrStats.m_slopeFriction);
+        }
+        else
+        {
+            Decelerate(m_statsManager.CurrStats.m_friction);
+        }
+    }
+    
     #endregion    
     
     #region Override of Entity

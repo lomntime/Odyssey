@@ -34,6 +34,14 @@ public class WalkPlayerState : PlayerState
                 entity.FaceDirectionSmooth(direction);
             }
         }
+        else
+        {
+            entity.Friction();
+            if (entity.LateralVelocity.sqrMagnitude <= 0)
+            {
+                entity.StateManager.Change<IdelPlayerState>();
+            }
+        }
     }
 
     /// <inheritdoc/>
