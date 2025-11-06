@@ -67,6 +67,41 @@ public class Player : Entity<Player>
             VerticalVelocity = new Vector3(0f,  speed, 0f);
         }
     }
+
+    /// <summary>
+    /// 跳跃
+    /// </summary>
+    public virtual void Jump()
+    {
+        var canMultiJump = (m_jumpCounter > 0) && (m_jumpCounter < m_statsManager.CurrStats.m_multiJumps);
+        var canCoyoteJump = (m_jumpCounter == 0) && (Time.time < LastGroundTime + m_statsManager.CurrStats.m_coyoteJumpThreshold);
+
+        IsGrounded = true;
+        if (IsGrounded || canMultiJump || canCoyoteJump)
+        {
+            if (m_inputManager.JumpDownGet()) 
+            {
+                Jump(m_statsManager.CurrStats.m_maxJumpHeight);
+            }
+        }
+        
+        if (m_inputManager.JumpUpGet() && (m_jumpCounter > 0) && (VerticalVelocity.y > m_statsManager.CurrStats.m_minJumpHeight))
+        {
+            VerticalVelocity = Vector3.up * m_statsManager.CurrStats.m_minJumpHeight;
+        }
+    }
+
+    /// <summary>
+    /// 跳跃
+    /// </summary>
+    /// <param name="height">跳跃高度</param>
+    public virtual void Jump(float height)
+    {
+        m_jumpCounter++;
+        VerticalVelocity = Vector3.up * height;
+        m_stateManager.Change<FallPlayerState>();
+        m_playerEvents.EventOnJump?.Invoke();
+    }
     
     #endregion    
     
@@ -78,7 +113,7 @@ public class Player : Entity<Player>
         InitializeInputManager();
         InitializeStatsManager();
     }
-
+    
     #endregion
 
     #region 内部函数
@@ -106,6 +141,11 @@ public class Player : Entity<Player>
     /// 玩家实体属性数据管理器
     /// </summary>
     public PlayerStatsManager StatsManager => m_statsManager;
+    
+    /// <summary>
+    /// 跳跃计数
+    /// </summary>
+    public int JumpCounter => m_jumpCounter;
 
     #endregion
 
@@ -120,6 +160,16 @@ public class Player : Entity<Player>
     /// 玩家实体属性数据管理器
     /// </summary>
     protected PlayerStatsManager m_statsManager;
+    
+    /// <summary>
+    /// 玩家实体事件
+    /// </summary>
+    protected PlayerEvents m_playerEvents;
+    
+    /// <summary>
+    /// 跳跃计数
+    /// </summary>
+    protected int m_jumpCounter = 0;
 
     #endregion
 }

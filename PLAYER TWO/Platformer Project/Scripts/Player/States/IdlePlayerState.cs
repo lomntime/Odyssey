@@ -3,7 +3,7 @@
 /// <summary>
 /// 玩家空闲状态
 /// </summary>
-public class IdelPlayerState : PlayerState
+public class IdlePlayerState : PlayerState
 {
     #region override of EntityState
 
@@ -22,6 +22,8 @@ public class IdelPlayerState : PlayerState
     /// <inheritdoc/>
     protected override void OnStep(Player entity)
     {
+        entity.Jump();
+        
         entity.Gravity();
         
         var direction = entity.InputManager.MovementDirectionGet();

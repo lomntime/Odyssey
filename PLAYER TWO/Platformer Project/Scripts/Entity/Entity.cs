@@ -17,6 +17,11 @@ public abstract class EntityBase : MonoBehaviour
     /// 实体初始高度
     /// </summary>
     public virtual float OriginHeight {get; protected set;}
+    
+    /// <summary>
+    /// 上次处于地面时间
+    /// </summary>
+    public virtual float LastGroundTime { get; protected set; }
 
     /// <summary>
     /// 实体是否处于地面

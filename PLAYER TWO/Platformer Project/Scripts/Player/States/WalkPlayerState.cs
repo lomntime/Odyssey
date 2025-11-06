@@ -22,6 +22,8 @@ public class WalkPlayerState : PlayerState
     /// <inheritdoc/>
     protected override void OnStep(Player entity)
     {
+        entity.Jump();
+        
         entity.Gravity();
         
         var direction = entity.InputManager.MovementCameraDirectionGet();
@@ -41,7 +43,7 @@ public class WalkPlayerState : PlayerState
             entity.Friction();
             if (entity.LateralVelocity.sqrMagnitude <= 0)
             {
-                entity.StateManager.Change<IdelPlayerState>();
+                entity.StateManager.Change<IdlePlayerState>();
             }
         }
     }
