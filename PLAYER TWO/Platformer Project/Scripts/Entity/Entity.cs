@@ -33,6 +33,15 @@ public abstract class EntityBase : MonoBehaviour
     /// <returns></returns>
     public virtual bool IsPointUnderStep(Vector3 point) => StepPosition.y > point.y;
 
+    /// <summary>
+    /// 实体受到伤害
+    /// </summary>
+    /// <param name="damage"></param>
+    /// <param name="origin"></param>
+    public virtual void ApplyDamage(int damage, Vector3 origin)
+    {
+    }
+
     #endregion
     
     #region 属性
@@ -172,6 +181,20 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     }
 
     /// <summary>
+    /// 实体立即旋转到指定方向
+    /// </summary>
+    /// <param name="direction"></param>
+    public virtual void FaceDirection(Vector3 direction)
+    {
+        if (direction.sqrMagnitude > 0)
+        {
+            var rotation = Quaternion.LookRotation(direction, Vector3.up);
+
+            transform.rotation = rotation;
+        }
+    }
+
+    /// <summary>
     /// 实体旋转到指定方向
     /// </summary>
     /// <param name="direction"></param>
@@ -219,6 +242,7 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     {
         InitializeStateManager();
         InitializeCharacterController();
+        InitializePenetratorCollider();
     }
 
     protected virtual void Update()
@@ -258,6 +282,33 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
         CharacterController.minMoveDistance = 0f;
         
         OriginHeight = CharacterController.height;
+    }
+    
+    // 初始化用于碰撞渗透检测的盒碰撞器（辅助碰撞检测）
+    // 这个盒碰撞器的作用是检测角色是否与其它物体相交（“穿模”检测）
+    protected virtual void InitializePenetratorCollider()
+    {
+        // 计算 XZ 平面的尺寸（直径 = 半径 * 2，减去 skinWidth 避免干扰）
+        var xzSize = Radius * 2f - CharacterController.skinWidth;
+
+        // 动态添加 BoxCollider
+        m_penetratorCollider = gameObject.AddComponent<BoxCollider>();
+
+        /*
+            Slope Limit：爬坡最大角度
+            Step Offset：爬梯最大高度
+            Skin Width：皮肤厚度
+            Min Move Distance：最小移动距离
+            Center、Radius、Height：角色用于检测碰撞的胶囊体中心、半径、高
+         */
+        // 设置盒碰撞器尺寸：XZ 平面是计算好的直径，高度减去stepOffset
+        m_penetratorCollider.size = new Vector3(xzSize, Height - CharacterController.stepOffset, xzSize);
+
+        // 设置碰撞器中心位置：在角色中心的基础上向上偏移 stepOffset 一半
+        m_penetratorCollider.center = Center + Vector3.up * CharacterController.stepOffset * 0.5f;
+
+        // 设置为触发器模式（不产生物理碰撞，只检测重叠）
+        m_penetratorCollider.isTrigger = true;
     }
 
     /// <summary>
@@ -481,6 +532,11 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     /// 减速度倍率
     /// </summary>
     protected float m_decelerationMultiplier = 1f;
+
+    /// <summary>
+    /// 盒型碰撞器
+    /// </summary>
+    protected BoxCollider m_penetratorCollider;
 
     #endregion
 }

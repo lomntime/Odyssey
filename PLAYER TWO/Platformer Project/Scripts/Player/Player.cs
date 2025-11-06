@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor.Media;
+using UnityEngine;
 
 /// <summary>
 /// 玩家实体
@@ -130,6 +131,39 @@ public class Player : Entity<Player>
         m_stateManager.Change<FallPlayerState>();
         m_playerEvents.EventOnJump?.Invoke();
     }
+
+    /// <summary>
+    /// 玩家收到伤害
+    /// </summary>
+    /// <param name="amount"></param>
+    /// <param name="origin"></param>
+    public override void ApplyDamage(int amount, Vector3 origin)
+    {
+        if (!Health.isEmpty && !Health.recovering)
+        {
+            m_health.Damage(amount);
+            var damageDir = origin - transform.position; 
+            damageDir.y = 0;
+            damageDir = damageDir.normalized;
+            FaceDirection(damageDir);
+
+            LateralVelocity = -transform.forward * m_statsManager.CurrStats.m_hurtBackwardsForce;
+
+            if (!IsOnWater)
+            {
+                VerticalVelocity = Vector3.up * m_statsManager.CurrStats.m_hurtUpwardForce;
+                m_stateManager.Change<HurtPlayerState>();
+            }
+            
+            m_playerEvents.EventOnHurt?.Invoke();
+            
+            // if (Health.isEmpty)
+            // {
+            //     Throw();
+            //     playerEvents.OnDie?.Invoke();
+            // }
+        }
+    }
     
     #endregion    
     
@@ -140,6 +174,8 @@ public class Player : Entity<Player>
         base.Awake();
         InitializeInputManager();
         InitializeStatsManager();
+        InitializeHealth();
+        InitializeTag();
         
         EntityEvents.EventOnGroundEnter.AddListener(ResetJumps);
     }
@@ -158,6 +194,16 @@ public class Player : Entity<Player>
     /// </summary>
     protected virtual void InitializeStatsManager() => m_statsManager = GetComponent<PlayerStatsManager>();
 
+    /// <summary>
+    /// 初始化玩家生命值
+    /// </summary>
+    protected virtual void InitializeHealth() => m_health = GetComponent<Health>();
+
+    /// <summary>
+    /// 初始化玩家Tag
+    /// </summary>
+    protected virtual void InitializeTag() => m_gameTags = global::GameTags.Player;
+
     #endregion
 
     #region 属性
@@ -173,9 +219,24 @@ public class Player : Entity<Player>
     public PlayerStatsManager StatsManager => m_statsManager;
     
     /// <summary>
+    /// 玩家生命值
+    /// </summary>
+    public Health Health => m_health;
+    
+    /// <summary>
+    /// 玩家Tag
+    /// </summary>
+    public string GameTags => m_gameTags;
+    
+    /// <summary>
     /// 跳跃计数
     /// </summary>
     public int JumpCounter => m_jumpCounter;
+    
+    /// <summary>
+    /// 是否处于水中
+    /// </summary>
+    public bool IsOnWater => m_isOnWater;
 
     #endregion
 
@@ -198,9 +259,24 @@ public class Player : Entity<Player>
     protected PlayerStatsManager m_statsManager;
     
     /// <summary>
+    /// 玩家生命值
+    /// </summary>
+    protected Health m_health;
+    
+    /// <summary>
+    /// 玩家Tag
+    /// </summary>
+    protected string m_gameTags;
+    
+    /// <summary>
     /// 跳跃计数
     /// </summary>
     protected int m_jumpCounter = 0;
+
+    /// <summary>
+    /// 是否处于水中
+    /// </summary>
+    protected bool m_isOnWater;
 
     #endregion
 }
