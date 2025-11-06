@@ -16,7 +16,9 @@ public class FallPlayerState : PlayerState
     protected override void OnStep(global::Player entity)
     {
         entity.Gravity();
+        entity.SnapToGround();
         entity.FaceDirectionSmooth(entity.LateralVelocity);
+        entity.AccelerateToInputDirection();
         entity.Jump();
 
         if (entity.IsGrounded)

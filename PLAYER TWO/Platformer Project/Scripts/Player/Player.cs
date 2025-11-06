@@ -48,11 +48,19 @@ public class Player : Entity<Player>
     }
 
     /// <summary>
+    /// 依据相机方向平滑移动玩家
+    /// </summary>
+    public virtual void AccelerateToInputDirection()
+    {
+        var inputDirection = m_inputManager.MovementCameraDirectionGet();
+        Accelerate(inputDirection);
+    }
+
+    /// <summary>
     /// 重力下落
     /// </summary>
     public virtual void Gravity()
     {
-        IsGrounded = false;
         if (!IsGrounded && VerticalVelocity.y > -m_statsManager.CurrStats.m_gravityTopSpeed)
         {
             var speed = VerticalVelocity.y;
@@ -69,14 +77,34 @@ public class Player : Entity<Player>
     }
 
     /// <summary>
+    /// 通过Snap使玩家保持贴地
+    /// </summary>
+    public virtual void SnapToGround() => SnapToGround(StatsManager.CurrStats.m_snapForce);
+
+    /// <summary>
+    /// 重置跳跃计数
+    /// </summary>
+    public virtual void ResetJumps() => m_jumpCounter = 0;
+    
+    /// <summary>
+    /// 下落逻辑
+    /// </summary>
+    public virtual void Fall()
+    {
+        if (!IsGrounded)
+        {
+            m_stateManager.Change<FallPlayerState>();
+        }
+    }
+
+    /// <summary>
     /// 跳跃
     /// </summary>
     public virtual void Jump()
     {
         var canMultiJump = (m_jumpCounter > 0) && (m_jumpCounter < m_statsManager.CurrStats.m_multiJumps);
         var canCoyoteJump = (m_jumpCounter == 0) && (Time.time < LastGroundTime + m_statsManager.CurrStats.m_coyoteJumpThreshold);
-
-        IsGrounded = true;
+        
         if (IsGrounded || canMultiJump || canCoyoteJump)
         {
             if (m_inputManager.JumpDownGet()) 
@@ -112,6 +140,8 @@ public class Player : Entity<Player>
         base.Awake();
         InitializeInputManager();
         InitializeStatsManager();
+        
+        EntityEvents.EventOnGroundEnter.AddListener(ResetJumps);
     }
     
     #endregion
@@ -150,6 +180,12 @@ public class Player : Entity<Player>
     #endregion
 
     #region 字段
+    
+    /// <summary>
+    /// 玩家实体事件
+    /// </summary>
+    [Header("玩家实体事件")]
+    public PlayerEvents m_playerEvents;
 
     /// <summary>
     /// 输入管理器
@@ -160,11 +196,6 @@ public class Player : Entity<Player>
     /// 玩家实体属性数据管理器
     /// </summary>
     protected PlayerStatsManager m_statsManager;
-    
-    /// <summary>
-    /// 玩家实体事件
-    /// </summary>
-    protected PlayerEvents m_playerEvents;
     
     /// <summary>
     /// 跳跃计数

@@ -85,7 +85,10 @@ public class PlayerInputManager : MonoBehaviour
             return false;
         }
         
-        return m_look.activeControl.device.name.Equals(MouseDeviceName);
+        // return m_look.activeControl.device.name.Equals(MouseDeviceName);
+        
+        // todo : 临时做法
+        return true;
     }
 
     /// <summary>
