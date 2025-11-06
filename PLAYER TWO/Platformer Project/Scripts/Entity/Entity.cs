@@ -5,12 +5,30 @@ using UnityEngine;
 /// </summary>
 public abstract class EntityBase : MonoBehaviour
 {
-    public Vector3 UnsizedPosition => transform.position;
+    #region 属性
+    public virtual Vector3 UnsizedPosition => transform.position;
+    
+    /// <summary>
+    /// 实体的角色控制器
+    /// </summary>
+    public virtual CharacterController CharacterController { get; protected set; }
+    
+    /// <summary>
+    /// 实体初始高度
+    /// </summary>
+    public virtual float OriginHeight {get; protected set;}
 
     /// <summary>
     /// 实体是否处于地面
     /// </summary>
-    public bool IsGrounded { get; set; } = true;
+    public virtual bool IsGrounded { get; set; } = true;
+    
+    /// <summary>
+    /// 实体是否处于斜坡上
+    /// </summary>
+    public virtual bool IsOnSlopingGround { get; protected set; } = false;
+
+    #endregion
 }
 
 /// <summary>
@@ -71,13 +89,24 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
         transform.rotation = Quaternion.RotateTowards(rotation, target, rotationDetail);
     }
 
+    /// <summary>
+    /// 平滑减速
+    /// </summary>
+    /// <param name="deceleration"></param>
+    public virtual void Decelerate(float deceleration)
+    {
+        var delta =  deceleration * m_decelerationMultiplier * Time.deltaTime;
+        LateralVelocity = Vector3.MoveTowards(LateralVelocity, Vector3.zero, delta);
+    }
+    
     #endregion
     
     #region 生命周期
 
     protected virtual void Awake()
     {
-        m_stateManager = GetComponent<EntityStateManager<T>>();
+        InitializeStateManager();
+        InitializeCharacterController();
     }
 
     protected virtual void Update()
@@ -91,6 +120,29 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     #endregion
 
     #region 内部函数
+    
+    /// <summary>
+    /// 初始化实体状态控制器
+    /// </summary>
+    protected virtual void InitializeStateManager() => m_stateManager = GetComponent<EntityStateManager<T>>();
+
+    /// <summary>
+    /// 初始化角色控制器 
+    /// </summary>
+    protected virtual void InitializeCharacterController()
+    {
+        CharacterController = GetComponent<CharacterController>();
+
+        if (!CharacterController)
+        {
+            CharacterController = gameObject.AddComponent<CharacterController>();
+        }
+
+        CharacterController.skinWidth = 0.0005f;
+        CharacterController.minMoveDistance = 0f;
+        
+        OriginHeight = CharacterController.height;
+    }
 
     /// <summary>
     /// 驱动状态执行
@@ -102,6 +154,12 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     /// </summary>
     protected virtual void HandleController()
     {
+        if (CharacterController.enabled)
+        {
+            CharacterController.Move(Velocity * Time.deltaTime);
+            return;
+        }
+        
         transform.position += m_velocity * Time.deltaTime;
     }
 

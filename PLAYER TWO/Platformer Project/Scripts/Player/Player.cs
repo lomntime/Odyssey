@@ -25,7 +25,48 @@ public class Player : Entity<Player>
     /// 玩家角色平滑朝向移动方向
     /// </summary>
     /// <param name="direction"></param>
-    public virtual void FaceDirectionSmooth(Vector3 direction) => FaceDirection(direction, m_statsManager.CurrStats.rotationSpeed);
+    public virtual void FaceDirectionSmooth(Vector3 direction) => FaceDirection(direction, m_statsManager.CurrStats.m_rotationSpeed);
+    
+    /// <summary>
+    /// 平滑减速，使用减速度
+    /// </summary>
+    public virtual void Decelerate() => Decelerate(m_statsManager.CurrStats.m_deceleration);
+    
+    /// <summary>
+    /// 平滑减速，使用摩擦力
+    /// </summary>
+    public virtual void Friction()
+    {
+        if (IsOnSlopingGround)
+        {
+            Decelerate(m_statsManager.CurrStats.m_slopeFriction);
+        }
+        else
+        {
+            Decelerate(m_statsManager.CurrStats.m_friction);
+        }
+    }
+
+    /// <summary>
+    /// 重力下落
+    /// </summary>
+    public virtual void Gravity()
+    {
+        IsGrounded = false;
+        if (!IsGrounded && VerticalVelocity.y > -m_statsManager.CurrStats.m_gravityTopSpeed)
+        {
+            var speed = VerticalVelocity.y;
+            var force = VerticalVelocity.y > 0
+                ? m_statsManager.CurrStats.m_gravity
+                : m_statsManager.CurrStats.m_fallGravity;
+            
+            speed -= force * GravityMultiplier * Time.deltaTime;
+            
+            speed = Mathf.Max(speed, -m_statsManager.CurrStats.m_gravityTopSpeed);
+            
+            VerticalVelocity = new Vector3(0f,  speed, 0f);
+        }
+    }
     
     #endregion    
     
