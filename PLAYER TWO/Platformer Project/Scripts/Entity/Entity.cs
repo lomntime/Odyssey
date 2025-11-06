@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -5,8 +6,51 @@ using UnityEngine;
 /// </summary>
 public abstract class EntityBase : MonoBehaviour
 {
+    #region 外部接口
+
+    /// <summary>
+    /// 球体射线检测
+    /// </summary>
+    /// <param name="direction"></param>
+    /// <param name="distance"></param>
+    /// <param name="hit"></param>
+    /// <param name="layer"></param>
+    /// <param name="queryTriggerInteraction"></param>
+    /// <returns></returns>
+    public virtual bool SphereCast(Vector3 direction, float distance, out RaycastHit hit,
+        int layer = Physics.DefaultRaycastLayers,
+        QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.Ignore)
+    {
+        var castDistance = Mathf.Abs(distance- Radius);
+        
+        return Physics.SphereCast(Position, Radius, direction, out hit, castDistance, layer, queryTriggerInteraction);
+    }
+    
+    /// <summary>
+    /// 该点是否处于实体位置下方
+    /// </summary>
+    /// <param name="point"></param>
+    /// <returns></returns>
+    public virtual bool IsPointUnderStep(Vector3 point) => StepPosition.y > point.y;
+
+    /// <summary>
+    /// 实体受到伤害
+    /// </summary>
+    /// <param name="damage"></param>
+    /// <param name="origin"></param>
+    public virtual void ApplyDamage(int damage, Vector3 origin)
+    {
+    }
+
+    #endregion
+    
     #region 属性
     public virtual Vector3 UnsizedPosition => transform.position;
+
+    /// <summary>
+    /// 实体事件
+    /// </summary>
+    public virtual EntityEvents EntityEvents => m_entityEvents;
     
     /// <summary>
     /// 实体的角色控制器
@@ -17,6 +61,56 @@ public abstract class EntityBase : MonoBehaviour
     /// 实体初始高度
     /// </summary>
     public virtual float OriginHeight {get; protected set;}
+    
+    /// <summary>
+    /// 上次处于地面时间
+    /// </summary>
+    public virtual float LastGroundTime { get; protected set; }
+    
+    /// <summary>
+    /// 当前地面角度
+    /// </summary>
+    public virtual float GroundAngle { get; protected set; }
+    
+    /// <summary>
+    /// 当前地面法线
+    /// </summary>
+    public virtual Vector3 GroundNormal { get; protected set; }
+    
+    /// <summary>
+    /// 当前地面的局部倾斜方向
+    /// </summary>
+    public virtual Vector3 LocalSlopeDirection { get; protected set; }
+    
+    /// <summary>
+    /// 当前地面的碰撞信息
+    /// </summary>
+    public virtual RaycastHit GroundHit { get; protected set; }
+    
+    /// <summary>
+    /// 实体碰撞器高度
+    /// </summary>
+    public virtual float Height => CharacterController.height;
+    
+    /// <summary>
+    /// 实体碰撞器半径
+    /// </summary>
+    public virtual float Radius => CharacterController.radius;
+    
+    /// <summary>
+    /// 实体碰撞器中心点
+    /// </summary>
+    public virtual Vector3 Center => CharacterController.center;
+
+    /// <summary>
+    /// 实体当前位置
+    /// </summary>
+    public virtual Vector3 Position => transform.position + Center;
+    
+    /// <summary>
+    /// 实体底部位置
+    /// </summary>
+    public Vector3 StepPosition => Position - transform.up * (Height * 0.5f - CharacterController.stepOffset) ;
 
     /// <summary>
     /// 实体是否处于地面
@@ -27,6 +121,21 @@ public abstract class EntityBase : MonoBehaviour
     /// 实体是否处于斜坡上
     /// </summary>
     public virtual bool IsOnSlopingGround { get; protected set; } = false;
+
+    #endregion
+
+    #region 字段
+    
+    /// <summary>
+    /// 实体事件
+    /// </summary>
+    [Header("实体事件")]
+    public EntityEvents m_entityEvents;
+
+    /// <summary>
+    /// 地面偏移检测
+    /// </summary>
+    public readonly float m_groundOffest = 0.1f;
 
     #endregion
 }
@@ -72,6 +181,20 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     }
 
     /// <summary>
+    /// 实体立即旋转到指定方向
+    /// </summary>
+    /// <param name="direction"></param>
+    public virtual void FaceDirection(Vector3 direction)
+    {
+        if (direction.sqrMagnitude > 0)
+        {
+            var rotation = Quaternion.LookRotation(direction, Vector3.up);
+
+            transform.rotation = rotation;
+        }
+    }
+
+    /// <summary>
     /// 实体旋转到指定方向
     /// </summary>
     /// <param name="direction"></param>
@@ -98,6 +221,18 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
         var delta =  deceleration * m_decelerationMultiplier * Time.deltaTime;
         LateralVelocity = Vector3.MoveTowards(LateralVelocity, Vector3.zero, delta);
     }
+
+    /// <summary>
+    /// 使实体吸附地面
+    /// </summary>
+    /// <param name="force"></param>
+    public virtual void SnapToGround(float force)
+    {
+        if (IsGrounded && VerticalVelocity.y <= 0)
+        {
+            VerticalVelocity =  Vector3.down * force;
+        }
+    }
     
     #endregion
     
@@ -107,14 +242,19 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     {
         InitializeStateManager();
         InitializeCharacterController();
+        InitializePenetratorCollider();
     }
 
     protected virtual void Update()
     {
         if(m_stateManager == null || Time.timeScale <= 0) return;
-        
-        HandleState();
-        HandleController();
+
+        if (CharacterController.enabled)
+        {
+            HandleState();
+            HandleController();
+            HandleGround();
+        }
     }
 
     #endregion
@@ -143,7 +283,90 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
         
         OriginHeight = CharacterController.height;
     }
+    
+    // 初始化用于碰撞渗透检测的盒碰撞器（辅助碰撞检测）
+    // 这个盒碰撞器的作用是检测角色是否与其它物体相交（“穿模”检测）
+    protected virtual void InitializePenetratorCollider()
+    {
+        // 计算 XZ 平面的尺寸（直径 = 半径 * 2，减去 skinWidth 避免干扰）
+        var xzSize = Radius * 2f - CharacterController.skinWidth;
 
+        // 动态添加 BoxCollider
+        m_penetratorCollider = gameObject.AddComponent<BoxCollider>();
+
+        /*
+            Slope Limit：爬坡最大角度
+            Step Offset：爬梯最大高度
+            Skin Width：皮肤厚度
+            Min Move Distance：最小移动距离
+            Center、Radius、Height：角色用于检测碰撞的胶囊体中心、半径、高
+         */
+        // 设置盒碰撞器尺寸：XZ 平面是计算好的直径，高度减去stepOffset
+        m_penetratorCollider.size = new Vector3(xzSize, Height - CharacterController.stepOffset, xzSize);
+
+        // 设置碰撞器中心位置：在角色中心的基础上向上偏移 stepOffset 一半
+        m_penetratorCollider.center = Center + Vector3.up * CharacterController.stepOffset * 0.5f;
+
+        // 设置为触发器模式（不产生物理碰撞，只检测重叠）
+        m_penetratorCollider.isTrigger = true;
+    }
+
+    /// <summary>
+    /// 检测是否符合着陆条件
+    /// </summary>
+    /// <param name="hit"></param>
+    /// <returns></returns>
+    protected virtual bool EvaluateLanding(RaycastHit hit)
+    {
+        return IsPointUnderStep(hit.point) && Vector3.Angle(hit.normal, Vector3.up) < CharacterController.slopeLimit;
+    }
+
+    /// <summary>
+    /// 实体进入地面
+    /// </summary>
+    /// <param name="hit"></param>
+    protected virtual void EnterGround(RaycastHit hit)
+    {
+        if (!IsGrounded)
+        {
+            GroundHit = hit;
+            IsGrounded = true;
+            EntityEvents.EventOnGroundEnter?.Invoke();
+        }
+    }
+
+    /// <summary>
+    /// 实体离开地面
+    /// </summary>
+    /// <param name="hit"></param>
+    protected virtual void ExitGround(RaycastHit hit)
+    {
+        if (IsGrounded)
+        {
+            IsGrounded = false;
+            transform.parent = null;
+            LastGroundTime = Time.time;
+            VerticalVelocity = Vector3.Max(VerticalVelocity, Vector3.zero);
+            EntityEvents.EventOnGroundExit?.Invoke();
+        }
+    }
+
+    /// <summary>
+    /// 更新地面相关数据
+    /// </summary>
+    /// <param name="hit"></param>
+    protected virtual void UpdateGround(RaycastHit hit)
+    {
+        if (IsGrounded)
+        {
+            GroundHit = hit;
+            GroundNormal = hit.normal;
+            GroundAngle = Vector3.Angle(Vector3.up, hit.normal);
+            LocalSlopeDirection = new Vector3(hit.normal.x, 0f, hit.normal.z).normalized;
+            transform.parent = hit.collider.CompareTag(GameTags.Platform) ? hit.transform : null;
+        }
+    }
+    
     /// <summary>
     /// 驱动状态执行
     /// </summary>
@@ -161,6 +384,33 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
         }
         
         transform.position += m_velocity * Time.deltaTime;
+    }
+
+    /// <summary>
+    /// 实体与地面检测逻辑
+    /// </summary>
+    protected virtual void HandleGround()
+    {
+        var distacne = (Height * 0.5f) + m_groundOffest;
+
+        if (SphereCast(Vector3.down, distacne, out var hit) && VerticalVelocity.y <= 0)
+        {
+            if (!IsGrounded)
+            {
+                if (EvaluateLanding(hit))
+                {
+                    EnterGround(hit);
+                }
+            }
+            else if (IsPointUnderStep(hit.point))
+            {
+                UpdateGround(hit);
+            }
+        }
+        else
+        {
+            ExitGround(hit);
+        }
     }
 
     #endregion
@@ -282,6 +532,11 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     /// 减速度倍率
     /// </summary>
     protected float m_decelerationMultiplier = 1f;
+
+    /// <summary>
+    /// 盒型碰撞器
+    /// </summary>
+    protected BoxCollider m_penetratorCollider;
 
     #endregion
 }

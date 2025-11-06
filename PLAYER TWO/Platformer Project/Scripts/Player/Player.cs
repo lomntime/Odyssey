@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor.Media;
+using UnityEngine;
 
 /// <summary>
 /// 玩家实体
@@ -48,11 +49,19 @@ public class Player : Entity<Player>
     }
 
     /// <summary>
+    /// 依据相机方向平滑移动玩家
+    /// </summary>
+    public virtual void AccelerateToInputDirection()
+    {
+        var inputDirection = m_inputManager.MovementCameraDirectionGet();
+        Accelerate(inputDirection);
+    }
+
+    /// <summary>
     /// 重力下落
     /// </summary>
     public virtual void Gravity()
     {
-        IsGrounded = false;
         if (!IsGrounded && VerticalVelocity.y > -m_statsManager.CurrStats.m_gravityTopSpeed)
         {
             var speed = VerticalVelocity.y;
@@ -67,6 +76,94 @@ public class Player : Entity<Player>
             VerticalVelocity = new Vector3(0f,  speed, 0f);
         }
     }
+
+    /// <summary>
+    /// 通过Snap使玩家保持贴地
+    /// </summary>
+    public virtual void SnapToGround() => SnapToGround(StatsManager.CurrStats.m_snapForce);
+
+    /// <summary>
+    /// 重置跳跃计数
+    /// </summary>
+    public virtual void ResetJumps() => m_jumpCounter = 0;
+    
+    /// <summary>
+    /// 下落逻辑
+    /// </summary>
+    public virtual void Fall()
+    {
+        if (!IsGrounded)
+        {
+            m_stateManager.Change<FallPlayerState>();
+        }
+    }
+
+    /// <summary>
+    /// 跳跃
+    /// </summary>
+    public virtual void Jump()
+    {
+        var canMultiJump = (m_jumpCounter > 0) && (m_jumpCounter < m_statsManager.CurrStats.m_multiJumps);
+        var canCoyoteJump = (m_jumpCounter == 0) && (Time.time < LastGroundTime + m_statsManager.CurrStats.m_coyoteJumpThreshold);
+        
+        if (IsGrounded || canMultiJump || canCoyoteJump)
+        {
+            if (m_inputManager.JumpDownGet()) 
+            {
+                Jump(m_statsManager.CurrStats.m_maxJumpHeight);
+            }
+        }
+        
+        if (m_inputManager.JumpUpGet() && (m_jumpCounter > 0) && (VerticalVelocity.y > m_statsManager.CurrStats.m_minJumpHeight))
+        {
+            VerticalVelocity = Vector3.up * m_statsManager.CurrStats.m_minJumpHeight;
+        }
+    }
+
+    /// <summary>
+    /// 跳跃
+    /// </summary>
+    /// <param name="height">跳跃高度</param>
+    public virtual void Jump(float height)
+    {
+        m_jumpCounter++;
+        VerticalVelocity = Vector3.up * height;
+        m_stateManager.Change<FallPlayerState>();
+        m_playerEvents.EventOnJump?.Invoke();
+    }
+
+    /// <summary>
+    /// 玩家收到伤害
+    /// </summary>
+    /// <param name="amount"></param>
+    /// <param name="origin"></param>
+    public override void ApplyDamage(int amount, Vector3 origin)
+    {
+        if (!Health.isEmpty && !Health.recovering)
+        {
+            m_health.Damage(amount);
+            var damageDir = origin - transform.position; 
+            damageDir.y = 0;
+            damageDir = damageDir.normalized;
+            FaceDirection(damageDir);
+
+            LateralVelocity = -transform.forward * m_statsManager.CurrStats.m_hurtBackwardsForce;
+
+            if (!IsOnWater)
+            {
+                VerticalVelocity = Vector3.up * m_statsManager.CurrStats.m_hurtUpwardForce;
+                m_stateManager.Change<HurtPlayerState>();
+            }
+            
+            m_playerEvents.EventOnHurt?.Invoke();
+            
+            // if (Health.isEmpty)
+            // {
+            //     Throw();
+            //     playerEvents.OnDie?.Invoke();
+            // }
+        }
+    }
     
     #endregion    
     
@@ -77,8 +174,12 @@ public class Player : Entity<Player>
         base.Awake();
         InitializeInputManager();
         InitializeStatsManager();
+        InitializeHealth();
+        InitializeTag();
+        
+        EntityEvents.EventOnGroundEnter.AddListener(ResetJumps);
     }
-
+    
     #endregion
 
     #region 内部函数
@@ -93,6 +194,16 @@ public class Player : Entity<Player>
     /// </summary>
     protected virtual void InitializeStatsManager() => m_statsManager = GetComponent<PlayerStatsManager>();
 
+    /// <summary>
+    /// 初始化玩家生命值
+    /// </summary>
+    protected virtual void InitializeHealth() => m_health = GetComponent<Health>();
+
+    /// <summary>
+    /// 初始化玩家Tag
+    /// </summary>
+    protected virtual void InitializeTag() => m_gameTags = global::GameTags.Player;
+
     #endregion
 
     #region 属性
@@ -106,10 +217,36 @@ public class Player : Entity<Player>
     /// 玩家实体属性数据管理器
     /// </summary>
     public PlayerStatsManager StatsManager => m_statsManager;
+    
+    /// <summary>
+    /// 玩家生命值
+    /// </summary>
+    public Health Health => m_health;
+    
+    /// <summary>
+    /// 玩家Tag
+    /// </summary>
+    public string GameTags => m_gameTags;
+    
+    /// <summary>
+    /// 跳跃计数
+    /// </summary>
+    public int JumpCounter => m_jumpCounter;
+    
+    /// <summary>
+    /// 是否处于水中
+    /// </summary>
+    public bool IsOnWater => m_isOnWater;
 
     #endregion
 
     #region 字段
+    
+    /// <summary>
+    /// 玩家实体事件
+    /// </summary>
+    [Header("玩家实体事件")]
+    public PlayerEvents m_playerEvents;
 
     /// <summary>
     /// 输入管理器
@@ -120,6 +257,26 @@ public class Player : Entity<Player>
     /// 玩家实体属性数据管理器
     /// </summary>
     protected PlayerStatsManager m_statsManager;
+    
+    /// <summary>
+    /// 玩家生命值
+    /// </summary>
+    protected Health m_health;
+    
+    /// <summary>
+    /// 玩家Tag
+    /// </summary>
+    protected string m_gameTags;
+    
+    /// <summary>
+    /// 跳跃计数
+    /// </summary>
+    protected int m_jumpCounter = 0;
+
+    /// <summary>
+    /// 是否处于水中
+    /// </summary>
+    protected bool m_isOnWater;
 
     #endregion
 }

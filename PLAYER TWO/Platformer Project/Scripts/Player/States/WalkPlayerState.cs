@@ -10,19 +10,21 @@ public class WalkPlayerState : PlayerState
     /// <inheritdoc/>
     protected override void OnEnter(Player entity)
     {
-        throw new System.NotImplementedException();
     }
 
     /// <inheritdoc/>
     protected override void OnExit(Player entity)
     {
-        throw new System.NotImplementedException();
     }
 
     /// <inheritdoc/>
     protected override void OnStep(Player entity)
     {
+        entity.Jump();
+        entity.SnapToGround();
         entity.Gravity();
+        entity.Fall();
+        entity.AccelerateToInputDirection();
         
         var direction = entity.InputManager.MovementCameraDirectionGet();
 
@@ -41,7 +43,7 @@ public class WalkPlayerState : PlayerState
             entity.Friction();
             if (entity.LateralVelocity.sqrMagnitude <= 0)
             {
-                entity.StateManager.Change<IdelPlayerState>();
+                entity.StateManager.Change<IdlePlayerState>();
             }
         }
     }
@@ -49,7 +51,6 @@ public class WalkPlayerState : PlayerState
     /// <inheritdoc/>
     protected override void OnContact(Player entity, Collider collider)
     {
-        throw new System.NotImplementedException();
     }
 
     #endregion

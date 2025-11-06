@@ -18,11 +18,14 @@ public class BrakePlayerState : PlayerState
     /// <inheritdoc/>
     protected override void OnStep(Player entity)
     {
+        entity.SnapToGround();
+        entity.Jump();
+        entity.Fall();
         entity.Decelerate();
 
         if (entity.LateralVelocity.sqrMagnitude <= 0)
         {
-            entity.StateManager.Change<IdelPlayerState>();
+            entity.StateManager.Change<IdlePlayerState>();
         }
     }
 

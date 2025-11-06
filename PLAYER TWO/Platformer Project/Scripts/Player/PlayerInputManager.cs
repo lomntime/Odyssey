@@ -11,6 +11,14 @@ public class PlayerInputManager : MonoBehaviour
     protected virtual void Awake() => CacheAction();
     
     protected virtual void OnEnable() => m_inputAction.Enable();
+
+    protected virtual void Update()
+    {
+        if (m_jump.WasPressedThisFrame())
+        {
+            m_lastJumpTime = Time.time;
+        }
+    }
     
     protected virtual void OnDisable() => m_inputAction.Disable();
 
@@ -77,8 +85,32 @@ public class PlayerInputManager : MonoBehaviour
             return false;
         }
         
-        return m_look.activeControl.device.name.Equals(MouseDeviceName);
+        // return m_look.activeControl.device.name.Equals(MouseDeviceName);
+        
+        // todo : 临时做法
+        return true;
     }
+
+    /// <summary>
+    /// 是否支持跳跃 跳跃键按下 
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool JumpDownGet()
+    {
+        if(m_lastJumpTime != null &&  Time.time - m_lastJumpTime < JumpBuffer)
+        {
+            m_lastJumpTime = null;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 跳跃键抬起
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool JumpUpGet() => m_jump.WasReleasedThisFrame();
     
     #endregion
 
@@ -93,6 +125,7 @@ public class PlayerInputManager : MonoBehaviour
 
         m_movement = m_inputAction.FindAction(MovementActionName);
         m_look = m_inputAction.FindAction(LookActionName);
+        m_jump = m_inputAction.FindAction(JumpActionName);
     }
 
     /// <summary>
@@ -136,9 +169,19 @@ public class PlayerInputManager : MonoBehaviour
     protected InputAction m_look;
     
     /// <summary>
+    /// 跳跃
+    /// </summary>
+    protected InputAction m_jump;
+    
+    /// <summary>
     /// 玩家视角相机相
     /// </summary>
     protected Camera m_camera;
+
+    /// <summary>
+    /// 上次跳跃时间
+    /// </summary>
+    protected float? m_lastJumpTime;
 
     /// <summary>
     /// InputAction资产
@@ -167,9 +210,19 @@ public class PlayerInputManager : MonoBehaviour
     protected const string LookActionName = "Look";
     
     /// <summary>
+    /// 跳跃Action名称
+    /// </summary>
+    protected const string JumpActionName = "Jump";
+    
+    /// <summary>
     /// 鼠标设备名称
     /// </summary>
     protected const string MouseDeviceName = "Mouse";
+
+    /// <summary>
+    /// 跳跃缓冲时间
+    /// </summary>
+    protected const float JumpBuffer = 0.15f;
 
     #endregion
 }
