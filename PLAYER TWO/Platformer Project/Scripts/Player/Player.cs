@@ -29,6 +29,12 @@ public class Player : Entity<Player>
     public virtual void FaceDirectionSmooth(Vector3 direction) => FaceDirection(direction, m_statsManager.CurrStats.m_rotationSpeed);
     
     /// <summary>
+    /// 匍匐爬行
+    /// </summary>
+    /// <param name="direction"></param>
+    public virtual void CrawlingAccelerate(Vector3 direction) => Accelerate(direction, m_statsManager.CurrStats.m_crawlingTurningSpeed, m_statsManager.CurrStats.m_crawlingAcceleration, m_statsManager.CurrStats.m_crawlingTopSpeed);
+    
+    /// <summary>
     /// 平滑减速，使用减速度
     /// </summary>
     public virtual void Decelerate() => Decelerate(m_statsManager.CurrStats.m_deceleration);

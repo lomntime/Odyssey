@@ -29,7 +29,7 @@ public class CrouchPlayerState : PlayerState
             {
                 if (entity.LateralVelocity.sqrMagnitude == 0)
                 {
-                    // entity.StateManager.Change<CrawlingPlayerState>();
+                    entity.StateManager.Change<CrawlingPlayerState>();
                 }
             }
             
