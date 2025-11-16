@@ -2274,6 +2274,11 @@ MonoBehaviour:
   - BrakePlayerState
   - FallPlayerState
   - HurtPlayerState
+  - HurtPlayerState
+  - HurtPlayerState
+  - HurtPlayerState
+  - HurtPlayerState
+  - CrouchPlayerState
 --- !u!114 &9077142813939134806
 MonoBehaviour:
   m_ObjectHideFlags: 0

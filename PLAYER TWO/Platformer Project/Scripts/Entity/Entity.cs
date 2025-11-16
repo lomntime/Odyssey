@@ -13,6 +13,20 @@ public abstract class EntityBase : MonoBehaviour
     /// </summary>
     /// <param name="direction"></param>
     /// <param name="distance"></param>
+    /// <param name="layer"></param>
+    /// <param name="queryTriggerInteraction"></param>
+    /// <returns></returns>
+    public virtual bool SphereCast(Vector3 direction, float distance, int layer = Physics.DefaultRaycastLayers,
+        QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.Ignore)
+    {
+        return SphereCast(direction, distance, out _, layer, queryTriggerInteraction);
+    }
+
+    /// <summary>
+    /// 球体射线检测
+    /// </summary>
+    /// <param name="direction"></param>
+    /// <param name="distance"></param>
     /// <param name="hit"></param>
     /// <param name="layer"></param>
     /// <param name="queryTriggerInteraction"></param>
@@ -232,6 +246,17 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
         {
             VerticalVelocity =  Vector3.down * force;
         }
+    }
+    
+    // 调整角色控制器碰撞器高度
+    public virtual void ResizeCollider(float height)
+    {
+        // 计算新的高度和当前高度的差值
+        var delta = height - this.Height;
+        // 修改角色控制器的高度
+        CharacterController.height = height;
+        // 调整角色控制器的中心位置，使其根据高度变化自动平移
+        CharacterController.center += Vector3.up * delta * 0.5f;
     }
     
     #endregion

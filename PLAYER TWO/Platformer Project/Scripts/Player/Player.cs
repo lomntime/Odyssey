@@ -164,6 +164,11 @@ public class Player : Entity<Player>
             // }
         }
     }
+
+    /// <summary>
+    /// 是否能够站起
+    /// </summary>
+    public virtual bool CanStandUp() => !SphereCast(Vector3.up, OriginHeight);
     
     #endregion    
     
@@ -237,6 +242,11 @@ public class Player : Entity<Player>
     /// 是否处于水中
     /// </summary>
     public bool IsOnWater => m_isOnWater;
+    
+    /// <summary>
+    /// 是否持有物品
+    /// </summary>
+    public bool IsHolding { get; protected set; }
 
     #endregion
 

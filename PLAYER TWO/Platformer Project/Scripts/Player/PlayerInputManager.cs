@@ -111,6 +111,8 @@ public class PlayerInputManager : MonoBehaviour
     /// </summary>
     /// <returns></returns>
     public virtual bool JumpUpGet() => m_jump.WasReleasedThisFrame();
+
+    public virtual bool CrouchAndCrawGet() => m_crouch.IsPressed();
     
     #endregion
 
@@ -126,6 +128,7 @@ public class PlayerInputManager : MonoBehaviour
         m_movement = m_inputAction.FindAction(MovementActionName);
         m_look = m_inputAction.FindAction(LookActionName);
         m_jump = m_inputAction.FindAction(JumpActionName);
+        m_crouch = m_inputAction.FindAction(CrouchActionName);
     }
 
     /// <summary>
@@ -172,6 +175,11 @@ public class PlayerInputManager : MonoBehaviour
     /// 跳跃
     /// </summary>
     protected InputAction m_jump;
+
+    /// <summary>
+    /// 下蹲
+    /// </summary>
+    protected InputAction m_crouch;
     
     /// <summary>
     /// 玩家视角相机相
@@ -215,9 +223,15 @@ public class PlayerInputManager : MonoBehaviour
     protected const string JumpActionName = "Jump";
     
     /// <summary>
+    /// 下蹲Action名称
+    /// </summary>
+    protected const string CrouchActionName = "Crouch";
+    
+    /// <summary>
     /// 鼠标设备名称
     /// </summary>
     protected const string MouseDeviceName = "Mouse";
+    
 
     /// <summary>
     /// 跳跃缓冲时间

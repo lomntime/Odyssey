@@ -41,4 +41,9 @@ public class PlayerStats : EntityStats<PlayerStats>
     [Header("受伤反应")]
     public float m_hurtUpwardForce = 10f;        // 受伤时向上的力
     public float m_hurtBackwardsForce = 5f;      // 受伤时向后的力
+    
+    //==============================【下蹲】==============================//
+    [Header("下蹲属性")]
+    public float m_crouchHeight = 1f;            // 下蹲时角色高度
+    public float m_crouchFriction = 10f;         // 下蹲时摩擦力
 }
