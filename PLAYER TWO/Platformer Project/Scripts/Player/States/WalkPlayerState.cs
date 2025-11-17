@@ -46,6 +46,11 @@ public class WalkPlayerState : PlayerState
                 entity.StateManager.Change<IdlePlayerState>();
             }
         }
+
+        if (entity.InputManager.CrouchAndCrawGet())
+        {
+            entity.StateManager.Change<CrouchPlayerState>();
+        }
     }
 
     /// <inheritdoc/>

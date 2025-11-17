@@ -29,6 +29,12 @@ public class Player : Entity<Player>
     public virtual void FaceDirectionSmooth(Vector3 direction) => FaceDirection(direction, m_statsManager.CurrStats.m_rotationSpeed);
     
     /// <summary>
+    /// 匍匐爬行
+    /// </summary>
+    /// <param name="direction"></param>
+    public virtual void CrawlingAccelerate(Vector3 direction) => Accelerate(direction, m_statsManager.CurrStats.m_crawlingTurningSpeed, m_statsManager.CurrStats.m_crawlingAcceleration, m_statsManager.CurrStats.m_crawlingTopSpeed);
+    
+    /// <summary>
     /// 平滑减速，使用减速度
     /// </summary>
     public virtual void Decelerate() => Decelerate(m_statsManager.CurrStats.m_deceleration);
@@ -164,6 +170,11 @@ public class Player : Entity<Player>
             // }
         }
     }
+
+    /// <summary>
+    /// 是否能够站起
+    /// </summary>
+    public virtual bool CanStandUp() => !SphereCast(Vector3.up, OriginHeight);
     
     #endregion    
     
@@ -237,6 +248,11 @@ public class Player : Entity<Player>
     /// 是否处于水中
     /// </summary>
     public bool IsOnWater => m_isOnWater;
+    
+    /// <summary>
+    /// 是否持有物品
+    /// </summary>
+    public bool IsHolding { get; protected set; }
 
     #endregion
 

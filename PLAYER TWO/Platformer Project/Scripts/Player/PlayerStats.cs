@@ -41,4 +41,16 @@ public class PlayerStats : EntityStats<PlayerStats>
     [Header("受伤反应")]
     public float m_hurtUpwardForce = 10f;        // 受伤时向上的力
     public float m_hurtBackwardsForce = 5f;      // 受伤时向后的力
+    
+    //==============================【下蹲】==============================//
+    [Header("下蹲属性")]
+    public float m_crouchHeight = 1f;            // 下蹲时角色高度
+    public float m_crouchFriction = 10f;         // 下蹲时摩擦力
+    
+    //==============================【匍匐爬行】==============================//
+    [Header("匍匐爬行")]
+    public float m_crawlingAcceleration = 8f;    // 爬行加速度
+    public float m_crawlingFriction = 32f;       // 爬行摩擦力
+    public float m_crawlingTopSpeed = 2.5f;      // 爬行最高速度
+    public float m_crawlingTurningSpeed = 3f;    // 爬行转向速度
 }
