@@ -211,6 +211,11 @@ public class Player : Entity<Player>
     public virtual void ResetAirDash() => m_airDashCounter = 0;
     
     /// <summary>
+    /// 重置空中旋转计数
+    /// </summary>
+    public virtual void ResetAirSpin() => m_airSpinCounter = 0;
+    
+    /// <summary>
     /// 冲刺
     /// </summary>
     public virtual void Dash()
@@ -226,6 +231,25 @@ public class Player : Entity<Player>
             if (!IsGrounded) m_airDashCounter++;
             m_lastDashTime = Time.time;
             StateManager.Change<DashPlayerState>() ;
+        }
+    }
+
+    /// <summary>
+    /// 旋转
+    /// </summary>
+    public virtual void Spin()
+    {
+        var canAirSpin = (IsGrounded || StatsManager.CurrStats.m_canAirSpin) && AirSpinCounter < StatsManager.CurrStats.m_allowedAirSpins;
+
+        if (StatsManager.CurrStats.m_canAirSpin && canAirSpin && !IsHolding && InputManager.SpinDownGet())
+        {
+            if (!IsGrounded)
+            {
+                m_airSpinCounter++;
+            }
+            
+            StateManager.Change<SpinPlayerState>();
+            m_playerEvents.EventOnSpin?.Invoke();
         }
     }
 
@@ -257,6 +281,7 @@ public class Player : Entity<Player>
         {
             ResetJumps();
             ResetAirDash();
+            ResetAirSpin();
         });
     }
     
@@ -324,6 +349,11 @@ public class Player : Entity<Player>
     public float LastDashTime => m_lastDashTime;
     
     /// <summary>
+    /// 空中旋转计数
+    /// </summary>
+    public int  AirSpinCounter => m_airSpinCounter;
+    
+    /// <summary>
     /// 是否处于水中
     /// </summary>
     public bool IsOnWater => m_isOnWater;
@@ -377,6 +407,11 @@ public class Player : Entity<Player>
     /// 上一次冲刺时间
     /// </summary>
     protected float m_lastDashTime;
+
+    /// <summary>
+    /// 空中旋转计数
+    /// </summary>
+    protected int m_airSpinCounter;
 
     /// <summary>
     /// 是否处于水中

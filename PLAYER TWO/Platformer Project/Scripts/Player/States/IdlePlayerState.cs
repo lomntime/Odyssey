@@ -24,7 +24,7 @@ public class IdlePlayerState : PlayerState
         entity.SnapToGround();
         entity.Gravity();
         entity.Fall();
-        
+        entity.Spin();
         
         var direction = entity.InputManager.MovementDirectionGet();
 

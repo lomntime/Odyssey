@@ -46,6 +46,14 @@ public class PlayerStats : EntityStats<PlayerStats>
     public float m_crouchHeight = 1f;            // 下蹲时角色高度
     public float m_crouchFriction = 10f;         // 下蹲时摩擦力
     
+    //==============================【旋转攻击】==============================//
+    [Header("旋转攻击")]
+    public bool m_canSpin = true;                // 是否可以旋转攻击
+    public bool m_canAirSpin = true;             // 是否可以空中旋转攻击
+    public float m_spinDuration = 0.5f;          // 旋转攻击持续时间
+    public float m_airSpinUpwardForce = 10f;     // 空中旋转攻击时的上升力
+    public int m_allowedAirSpins = 1;            // 允许的空中旋转次数
+    
     //==============================【匍匐爬行】==============================//
     [Header("匍匐爬行")]
     public float m_crawlingAcceleration = 8f;    // 爬行加速度

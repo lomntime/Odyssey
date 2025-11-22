@@ -25,6 +25,7 @@ public class WalkPlayerState : PlayerState
         entity.Gravity();
         entity.Fall();
         entity.Dash();
+        entity.Spin();
         
         var direction = entity.InputManager.MovementCameraDirectionGet();
 

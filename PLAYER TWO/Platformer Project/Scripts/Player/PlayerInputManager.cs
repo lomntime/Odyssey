@@ -125,6 +125,12 @@ public class PlayerInputManager : MonoBehaviour
     /// </summary>
     /// <returns></returns>
     public virtual bool StompDownGet() => m_stomp.WasPressedThisFrame();
+    
+    /// <summary>
+    /// 旋转键按下
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool SpinDownGet() => m_spin.IsPressed();
 
     /// <summary>
     /// 临时锁定移动方向
@@ -152,6 +158,7 @@ public class PlayerInputManager : MonoBehaviour
         m_crouch = m_inputAction.FindAction(CrouchActionName);
         m_dash = m_inputAction.FindAction(DashActionName);
         m_stomp = m_inputAction.FindAction(StompActionName);
+        m_spin =  m_inputAction.FindAction(SpinActionName);
     }
 
     /// <summary>
@@ -213,6 +220,11 @@ public class PlayerInputManager : MonoBehaviour
     /// 下砸
     /// </summary>
     protected InputAction m_stomp;
+
+    /// <summary>
+    /// 旋转
+    /// </summary>
+    protected InputAction m_spin;
     
     /// <summary>
     /// 玩家视角相机相
@@ -269,6 +281,11 @@ public class PlayerInputManager : MonoBehaviour
     /// 下砸Action状态
     /// </summary>
     protected const string StompActionName = "Stomp";
+    
+    /// <summary>
+    /// 旋转Action状态
+    /// </summary>
+    protected const string SpinActionName = "Spin";
     
     /// <summary>
     /// 鼠标设备名称
