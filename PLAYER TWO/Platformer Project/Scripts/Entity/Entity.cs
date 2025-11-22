@@ -195,6 +195,18 @@ public abstract class Entity<T> : EntityBase where T : Entity<T>
     }
 
     /// <summary>
+    /// 应用重力加速度
+    /// </summary>
+    /// <param name="gravity"></param>
+    public virtual void Gravity(float gravity)
+    {
+        if (!IsGrounded)
+        {
+            VerticalVelocity += Vector3.down * gravity * m_gravityMultiplier * Time.deltaTime;
+        }
+    }
+
+    /// <summary>
     /// 实体立即旋转到指定方向
     /// </summary>
     /// <param name="direction"></param>

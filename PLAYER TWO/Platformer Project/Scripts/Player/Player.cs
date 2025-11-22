@@ -1,5 +1,4 @@
-﻿using UnityEditor.Media;
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// 玩家实体
@@ -33,6 +32,15 @@ public class Player : Entity<Player>
     /// </summary>
     /// <param name="direction"></param>
     public virtual void CrawlingAccelerate(Vector3 direction) => Accelerate(direction, m_statsManager.CurrStats.m_crawlingTurningSpeed, m_statsManager.CurrStats.m_crawlingAcceleration, m_statsManager.CurrStats.m_crawlingTopSpeed);
+
+    /// <summary>
+    /// 在空翻动作中平移滑动玩家（后空翻参数）
+    /// </summary>
+    public virtual void BackflipAcceleration()
+    {
+        var direction = m_inputManager.MovementCameraDirectionGet();
+        Accelerate(direction, StatsManager.CurrStats.m_backflipTurningDrag, StatsManager.CurrStats.m_backflipAirAcceleration, StatsManager.CurrStats.m_crawlingTurningSpeed);
+    }
     
     /// <summary>
     /// 平滑减速，使用减速度
@@ -92,6 +100,12 @@ public class Player : Entity<Player>
     /// 重置跳跃计数
     /// </summary>
     public virtual void ResetJumps() => m_jumpCounter = 0;
+    
+    /// <summary>
+    /// 设置跳跃次数
+    /// </summary>
+    /// <param name="amount"></param>
+    public virtual void SetJumps(int amount) => m_jumpCounter = amount;
     
     /// <summary>
     /// 下落逻辑
@@ -175,6 +189,80 @@ public class Player : Entity<Player>
     /// 是否能够站起
     /// </summary>
     public virtual bool CanStandUp() => !SphereCast(Vector3.up, OriginHeight);
+
+    /// <summary>
+    /// 后空翻
+    /// </summary>
+    /// <param name="force"></param>
+    public virtual void Backflip(float force)
+    {
+        if (StatsManager.CurrStats.m_canBackflip && !IsHolding)
+        {
+            VerticalVelocity = Vector3.up * StatsManager.CurrStats.m_backflipJumpHeight;
+            LateralVelocity = -transform.forward * force;
+            StateManager.Change<BackflipPlayerState>();
+            m_playerEvents.EventOnBackflip?.Invoke();
+        }
+    }
+
+    /// <summary>
+    /// 重置空中冲刺计数
+    /// </summary>
+    public virtual void ResetAirDash() => m_airDashCounter = 0;
+    
+    /// <summary>
+    /// 重置空中旋转计数
+    /// </summary>
+    public virtual void ResetAirSpin() => m_airSpinCounter = 0;
+    
+    /// <summary>
+    /// 冲刺
+    /// </summary>
+    public virtual void Dash()
+    {
+        var canAirDash = StatsManager.CurrStats.m_canAirDash && !IsGrounded &&
+                         AirDashCounter < StatsManager.CurrStats.m_allowedAirDashes;
+
+        var canGroundDash = StatsManager.CurrStats.m_canGroundDash && IsGrounded &&
+                            Time.time - LastDashTime > StatsManager.CurrStats.m_groundDashCoolDown;
+
+        if (InputManager.DashDownGet() && (canAirDash || canGroundDash))
+        {
+            if (!IsGrounded) m_airDashCounter++;
+            m_lastDashTime = Time.time;
+            StateManager.Change<DashPlayerState>() ;
+        }
+    }
+
+    /// <summary>
+    /// 旋转
+    /// </summary>
+    public virtual void Spin()
+    {
+        var canAirSpin = (IsGrounded || StatsManager.CurrStats.m_canAirSpin) && AirSpinCounter < StatsManager.CurrStats.m_allowedAirSpins;
+
+        if (StatsManager.CurrStats.m_canAirSpin && canAirSpin && !IsHolding && InputManager.SpinDownGet())
+        {
+            if (!IsGrounded)
+            {
+                m_airSpinCounter++;
+            }
+            
+            StateManager.Change<SpinPlayerState>();
+            m_playerEvents.EventOnSpin?.Invoke();
+        }
+    }
+
+    /// <summary>
+    /// 下砸攻击
+    /// </summary>
+    public virtual void StompAttack()
+    {
+        if (!IsGrounded && !IsHolding && StatsManager.CurrStats.m_canStompAttack && InputManager.StompDownGet())
+        {
+            StateManager.Change<StompPlayerState>();
+        }
+    }
     
     #endregion    
     
@@ -188,7 +276,13 @@ public class Player : Entity<Player>
         InitializeHealth();
         InitializeTag();
         
-        EntityEvents.EventOnGroundEnter.AddListener(ResetJumps);
+        
+        EntityEvents.EventOnGroundEnter.AddListener(() =>
+        {
+            ResetJumps();
+            ResetAirDash();
+            ResetAirSpin();
+        });
     }
     
     #endregion
@@ -245,6 +339,21 @@ public class Player : Entity<Player>
     public int JumpCounter => m_jumpCounter;
     
     /// <summary>
+    /// 空中冲刺计数
+    /// </summary>
+    public int AirDashCounter => m_airDashCounter;
+    
+    /// <summary>
+    /// 上一次冲刺时间
+    /// </summary>
+    public float LastDashTime => m_lastDashTime;
+    
+    /// <summary>
+    /// 空中旋转计数
+    /// </summary>
+    public int  AirSpinCounter => m_airSpinCounter;
+    
+    /// <summary>
     /// 是否处于水中
     /// </summary>
     public bool IsOnWater => m_isOnWater;
@@ -288,6 +397,21 @@ public class Player : Entity<Player>
     /// 跳跃计数
     /// </summary>
     protected int m_jumpCounter = 0;
+    
+    /// <summary>
+    /// 空中冲刺计数
+    /// </summary>
+    protected int m_airDashCounter = 0;
+
+    /// <summary>
+    /// 上一次冲刺时间
+    /// </summary>
+    protected float m_lastDashTime;
+
+    /// <summary>
+    /// 空中旋转计数
+    /// </summary>
+    protected int m_airSpinCounter;
 
     /// <summary>
     /// 是否处于水中

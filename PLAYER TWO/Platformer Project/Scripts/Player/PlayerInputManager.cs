@@ -90,6 +90,12 @@ public class PlayerInputManager : MonoBehaviour
         // todo : 临时做法
         return true;
     }
+    
+    /// <summary>
+    /// 冲刺键按下
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool DashDownGet() => m_dash.IsPressed();
 
     /// <summary>
     /// 是否支持跳跃 跳跃键按下 
@@ -114,6 +120,27 @@ public class PlayerInputManager : MonoBehaviour
 
     public virtual bool CrouchAndCrawGet() => m_crouch.IsPressed();
     
+    /// <summary>
+    /// 下砸键按下
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool StompDownGet() => m_stomp.WasPressedThisFrame();
+    
+    /// <summary>
+    /// 旋转键按下
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool SpinDownGet() => m_spin.IsPressed();
+
+    /// <summary>
+    /// 临时锁定移动方向
+    /// </summary>
+    /// <param name="duration">锁定时长</param>
+    public virtual void LockMovementDirection(float duration = 0.25f)
+    {
+        m_movementDirectionUnlockTime = Time.time + duration;
+    }
+    
     #endregion
 
     #region 内部函数
@@ -129,6 +156,9 @@ public class PlayerInputManager : MonoBehaviour
         m_look = m_inputAction.FindAction(LookActionName);
         m_jump = m_inputAction.FindAction(JumpActionName);
         m_crouch = m_inputAction.FindAction(CrouchActionName);
+        m_dash = m_inputAction.FindAction(DashActionName);
+        m_stomp = m_inputAction.FindAction(StompActionName);
+        m_spin =  m_inputAction.FindAction(SpinActionName);
     }
 
     /// <summary>
@@ -182,6 +212,21 @@ public class PlayerInputManager : MonoBehaviour
     protected InputAction m_crouch;
     
     /// <summary>
+    /// 冲刺
+    /// </summary>
+    protected InputAction m_dash;
+    
+    /// <summary>
+    /// 下砸
+    /// </summary>
+    protected InputAction m_stomp;
+
+    /// <summary>
+    /// 旋转
+    /// </summary>
+    protected InputAction m_spin;
+    
+    /// <summary>
     /// 玩家视角相机相
     /// </summary>
     protected Camera m_camera;
@@ -226,6 +271,21 @@ public class PlayerInputManager : MonoBehaviour
     /// 下蹲Action名称
     /// </summary>
     protected const string CrouchActionName = "Crouch";
+    
+    /// <summary>
+    /// 冲刺Action名称
+    /// </summary>
+    protected const string DashActionName = "Dash";
+    
+    /// <summary>
+    /// 下砸Action状态
+    /// </summary>
+    protected const string StompActionName = "Stomp";
+    
+    /// <summary>
+    /// 旋转Action状态
+    /// </summary>
+    protected const string SpinActionName = "Spin";
     
     /// <summary>
     /// 鼠标设备名称

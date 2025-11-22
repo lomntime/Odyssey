@@ -24,7 +24,8 @@ public class WalkPlayerState : PlayerState
         entity.SnapToGround();
         entity.Gravity();
         entity.Fall();
-        entity.AccelerateToInputDirection();
+        entity.Dash();
+        entity.Spin();
         
         var direction = entity.InputManager.MovementCameraDirectionGet();
 
@@ -36,6 +37,10 @@ public class WalkPlayerState : PlayerState
             {
                 entity.Accelerate(direction);
                 entity.FaceDirectionSmooth(direction);
+            }
+            else
+            {
+                entity.StateManager.Change<BrakePlayerState>();
             }
         }
         else

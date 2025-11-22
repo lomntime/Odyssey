@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 
 /// <summary>
 /// 玩家实体属性数据
@@ -47,10 +46,48 @@ public class PlayerStats : EntityStats<PlayerStats>
     public float m_crouchHeight = 1f;            // 下蹲时角色高度
     public float m_crouchFriction = 10f;         // 下蹲时摩擦力
     
+    //==============================【旋转攻击】==============================//
+    [Header("旋转攻击")]
+    public bool m_canSpin = true;                // 是否可以旋转攻击
+    public bool m_canAirSpin = true;             // 是否可以空中旋转攻击
+    public float m_spinDuration = 0.5f;          // 旋转攻击持续时间
+    public float m_airSpinUpwardForce = 10f;     // 空中旋转攻击时的上升力
+    public int m_allowedAirSpins = 1;            // 允许的空中旋转次数
+    
     //==============================【匍匐爬行】==============================//
     [Header("匍匐爬行")]
     public float m_crawlingAcceleration = 8f;    // 爬行加速度
     public float m_crawlingFriction = 32f;       // 爬行摩擦力
     public float m_crawlingTopSpeed = 2.5f;      // 爬行最高速度
     public float m_crawlingTurningSpeed = 3f;    // 爬行转向速度
+    
+    //==============================【踩踏攻击】==============================//
+    [Header("踩踏攻击")]
+    public bool m_canStompAttack = true;         // 是否能进行踩踏攻击
+    public float m_stompDownwardForce = 20f;     // 踩踏时向下的力
+    public float m_stompAirTime = 0.8f;          // 空中踩踏时间
+    public float m_stompGroundTime = 0.5f;       // 落地后的硬直时间
+    public float m_stompGroundLeapHeight = 10f;  // 踩踏落地后的反弹高度
+    
+    //==============================【后空翻】==============================//
+    [Header("后空翻")]
+    public bool m_canBackflip = true;            // 是否能后空翻
+    public bool m_backflipLockMovement = true;   // 后空翻时是否锁定移动
+    public float m_backflipAirAcceleration = 12f;// 空中加速度
+    public float m_backflipTurningDrag = 2.5f;   // 转向阻力
+    public float m_backflipTopSpeed = 7.5f;      // 最高速度
+    public float m_backflipJumpHeight = 23f;     // 跳跃高度
+    public float m_backflipGravity = 35f;        // 重力
+    public float m_backflipBackwardForce = 4f;   // 向后推力
+    public float m_backflipBackwardTurnForce = 8f;// 向后转向力
+
+    //==============================【冲刺/疾跑】==============================//
+    [Header("冲刺/疾跑")]
+    public bool m_canAirDash = true;             // 是否能空中冲刺
+    public bool m_canGroundDash = true;          // 是否能地面冲刺
+    public float m_dashForce = 25f;              // 冲刺推力
+    public float m_dashDuration = 0.3f;          // 冲刺持续时间
+    public float m_groundDashCoolDown = 0.5f;    // 地面冲刺冷却时间
+    public float m_allowedAirDashes = 1;         // 允许的空中冲刺次数
+    
 }

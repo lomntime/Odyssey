@@ -63,12 +63,14 @@ public abstract class EntityStateManager<T> : EntityStateManager where T : Entit
         {
             if (m_currState != null)
             {
+                m_currState.Exit(m_entity);
                 m_currState.EventOnExit?.Invoke();
                 m_events.EventOnExit?.Invoke(m_currState.GetType());
                 m_prevState = m_currState;
             }
             
             m_currState = state;
+            m_currState.Enter(m_entity);
             m_currState.EventOnEnter?.Invoke();
             m_events.EventOnEnter?.Invoke(m_currState.GetType());
             m_events.EventOnChange?.Invoke();
