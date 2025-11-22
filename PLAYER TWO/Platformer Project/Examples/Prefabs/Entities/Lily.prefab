@@ -2274,18 +2274,20 @@ MonoBehaviour:
   - BrakePlayerState
   - FallPlayerState
   - HurtPlayerState
-  - HurtPlayerState
-  - HurtPlayerState
-  - HurtPlayerState
-  - HurtPlayerState
+  - IdlePlayerState
+  - IdlePlayerState
+  - IdlePlayerState
+  - IdlePlayerState
   - CrouchPlayerState
   - CrawlingPlayerState
-  - CrawlingPlayerState
-  - CrawlingPlayerState
-  - CrawlingPlayerState
-  - CrawlingPlayerState
-  - CrawlingPlayerState
+  - IdlePlayerState
+  - IdlePlayerState
+  - IdlePlayerState
+  - IdlePlayerState
+  - IdlePlayerState
   - BackflipPlayerState
+  - DashPlayerState
+  - DashPlayerState
 --- !u!114 &9077142813939134806
 MonoBehaviour:
   m_ObjectHideFlags: 0

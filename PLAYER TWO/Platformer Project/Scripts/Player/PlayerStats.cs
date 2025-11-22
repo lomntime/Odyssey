@@ -66,6 +66,13 @@ public class PlayerStats : EntityStats<PlayerStats>
     public float m_backflipBackwardForce = 4f;   // 向后推力
     public float m_backflipBackwardTurnForce = 8f;// 向后转向力
 
-    
+    //==============================【冲刺/疾跑】==============================//
+    [Header("冲刺/疾跑")]
+    public bool m_canAirDash = true;             // 是否能空中冲刺
+    public bool m_canGroundDash = true;          // 是否能地面冲刺
+    public float m_dashForce = 25f;              // 冲刺推力
+    public float m_dashDuration = 0.3f;          // 冲刺持续时间
+    public float m_groundDashCoolDown = 0.5f;    // 地面冲刺冷却时间
+    public float m_allowedAirDashes = 1;         // 允许的空中冲刺次数
     
 }

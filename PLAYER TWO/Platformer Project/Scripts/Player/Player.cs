@@ -205,6 +205,30 @@ public class Player : Entity<Player>
             m_playerEvents.EventOnBackflip?.Invoke();
         }
     }
+
+    /// <summary>
+    /// 重置空中冲刺计数
+    /// </summary>
+    public virtual void ResetAirDash() => m_airDashCounter = 0;
+    
+    /// <summary>
+    /// 冲刺
+    /// </summary>
+    public virtual void Dash()
+    {
+        var canAirDash = StatsManager.CurrStats.m_canAirDash && !IsGrounded &&
+                         AirDashCounter < StatsManager.CurrStats.m_allowedAirDashes;
+
+        var canGroundDash = StatsManager.CurrStats.m_canGroundDash && IsGrounded &&
+                            Time.time - LastDashTime > StatsManager.CurrStats.m_groundDashCoolDown;
+
+        if (InputManager.DashDownGet() && (canAirDash || canGroundDash))
+        {
+            if (!IsGrounded) m_airDashCounter++;
+            m_lastDashTime = Time.time;
+            StateManager.Change<DashPlayerState>() ;
+        }
+    }
     
     #endregion    
     
@@ -218,7 +242,12 @@ public class Player : Entity<Player>
         InitializeHealth();
         InitializeTag();
         
-        EntityEvents.EventOnGroundEnter.AddListener(ResetJumps);
+        
+        EntityEvents.EventOnGroundEnter.AddListener(() =>
+        {
+            ResetJumps();
+            ResetAirDash();
+        });
     }
     
     #endregion
@@ -275,6 +304,16 @@ public class Player : Entity<Player>
     public int JumpCounter => m_jumpCounter;
     
     /// <summary>
+    /// 空中冲刺计数
+    /// </summary>
+    public int AirDashCounter => m_airDashCounter;
+    
+    /// <summary>
+    /// 上一次冲刺时间
+    /// </summary>
+    public float LastDashTime => m_lastDashTime;
+    
+    /// <summary>
     /// 是否处于水中
     /// </summary>
     public bool IsOnWater => m_isOnWater;
@@ -318,6 +357,16 @@ public class Player : Entity<Player>
     /// 跳跃计数
     /// </summary>
     protected int m_jumpCounter = 0;
+    
+    /// <summary>
+    /// 空中冲刺计数
+    /// </summary>
+    protected int m_airDashCounter = 0;
+
+    /// <summary>
+    /// 上一次冲刺时间
+    /// </summary>
+    protected float m_lastDashTime;
 
     /// <summary>
     /// 是否处于水中

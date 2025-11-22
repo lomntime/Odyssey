@@ -90,6 +90,12 @@ public class PlayerInputManager : MonoBehaviour
         // todo : 临时做法
         return true;
     }
+    
+    /// <summary>
+    /// 冲刺键按下
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool DashDownGet() => m_dash.IsPressed();
 
     /// <summary>
     /// 是否支持跳跃 跳跃键按下 
@@ -138,6 +144,7 @@ public class PlayerInputManager : MonoBehaviour
         m_look = m_inputAction.FindAction(LookActionName);
         m_jump = m_inputAction.FindAction(JumpActionName);
         m_crouch = m_inputAction.FindAction(CrouchActionName);
+        m_dash = m_inputAction.FindAction(DashActionName);
     }
 
     /// <summary>
@@ -191,6 +198,11 @@ public class PlayerInputManager : MonoBehaviour
     protected InputAction m_crouch;
     
     /// <summary>
+    /// 冲刺
+    /// </summary>
+    protected InputAction m_dash;
+    
+    /// <summary>
     /// 玩家视角相机相
     /// </summary>
     protected Camera m_camera;
@@ -235,6 +247,11 @@ public class PlayerInputManager : MonoBehaviour
     /// 下蹲Action名称
     /// </summary>
     protected const string CrouchActionName = "Crouch";
+    
+    /// <summary>
+    /// 冲刺Action名称
+    /// </summary>
+    protected const string DashActionName = "Dash";
     
     /// <summary>
     /// 鼠标设备名称

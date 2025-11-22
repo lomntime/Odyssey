@@ -25,6 +25,7 @@ public class IdlePlayerState : PlayerState
         entity.Gravity();
         entity.Fall();
         
+        
         var direction = entity.InputManager.MovementDirectionGet();
 
         // 存在方向和水平速度时切换到walk状态

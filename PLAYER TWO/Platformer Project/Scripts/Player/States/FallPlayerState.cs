@@ -20,6 +20,7 @@ public class FallPlayerState : PlayerState
         entity.FaceDirectionSmooth(entity.LateralVelocity);
         entity.AccelerateToInputDirection();
         entity.Jump();
+        entity.Dash();
 
         if (entity.IsGrounded)
         {
