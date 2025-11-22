@@ -21,6 +21,7 @@ public class FallPlayerState : PlayerState
         entity.AccelerateToInputDirection();
         entity.Jump();
         entity.Dash();
+        entity.StompAttack();
 
         if (entity.IsGrounded)
         {

@@ -32,8 +32,9 @@ public class BackflipPlayerState : PlayerState
             entity.LateralVelocity = Vector3.zero;
             entity.StateManager.Change<IdlePlayerState>();
         }
-        else if(entity.VerticalVelocity.y < 0) 
+        else if(entity.VerticalVelocity.y < 0)
         {
+            entity.StompAttack();
         }
     }
 

@@ -1,5 +1,4 @@
-﻿using UnityEditor.Media;
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// 玩家实体
@@ -227,6 +226,17 @@ public class Player : Entity<Player>
             if (!IsGrounded) m_airDashCounter++;
             m_lastDashTime = Time.time;
             StateManager.Change<DashPlayerState>() ;
+        }
+    }
+
+    /// <summary>
+    /// 下砸攻击
+    /// </summary>
+    public virtual void StompAttack()
+    {
+        if (!IsGrounded && !IsHolding && StatsManager.CurrStats.m_canStompAttack && InputManager.StompDownGet())
+        {
+            StateManager.Change<StompPlayerState>();
         }
     }
     

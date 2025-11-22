@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 
 /// <summary>
 /// 玩家实体属性数据
@@ -53,6 +52,14 @@ public class PlayerStats : EntityStats<PlayerStats>
     public float m_crawlingFriction = 32f;       // 爬行摩擦力
     public float m_crawlingTopSpeed = 2.5f;      // 爬行最高速度
     public float m_crawlingTurningSpeed = 3f;    // 爬行转向速度
+    
+    //==============================【踩踏攻击】==============================//
+    [Header("踩踏攻击")]
+    public bool m_canStompAttack = true;         // 是否能进行踩踏攻击
+    public float m_stompDownwardForce = 20f;     // 踩踏时向下的力
+    public float m_stompAirTime = 0.8f;          // 空中踩踏时间
+    public float m_stompGroundTime = 0.5f;       // 落地后的硬直时间
+    public float m_stompGroundLeapHeight = 10f;  // 踩踏落地后的反弹高度
     
     //==============================【后空翻】==============================//
     [Header("后空翻")]

@@ -119,6 +119,12 @@ public class PlayerInputManager : MonoBehaviour
     public virtual bool JumpUpGet() => m_jump.WasReleasedThisFrame();
 
     public virtual bool CrouchAndCrawGet() => m_crouch.IsPressed();
+    
+    /// <summary>
+    /// 下砸键按下
+    /// </summary>
+    /// <returns></returns>
+    public virtual bool StompDownGet() => m_stomp.WasPressedThisFrame();
 
     /// <summary>
     /// 临时锁定移动方向
@@ -145,6 +151,7 @@ public class PlayerInputManager : MonoBehaviour
         m_jump = m_inputAction.FindAction(JumpActionName);
         m_crouch = m_inputAction.FindAction(CrouchActionName);
         m_dash = m_inputAction.FindAction(DashActionName);
+        m_stomp = m_inputAction.FindAction(StompActionName);
     }
 
     /// <summary>
@@ -203,6 +210,11 @@ public class PlayerInputManager : MonoBehaviour
     protected InputAction m_dash;
     
     /// <summary>
+    /// 下砸
+    /// </summary>
+    protected InputAction m_stomp;
+    
+    /// <summary>
     /// 玩家视角相机相
     /// </summary>
     protected Camera m_camera;
@@ -252,6 +264,11 @@ public class PlayerInputManager : MonoBehaviour
     /// 冲刺Action名称
     /// </summary>
     protected const string DashActionName = "Dash";
+    
+    /// <summary>
+    /// 下砸Action状态
+    /// </summary>
+    protected const string StompActionName = "Stomp";
     
     /// <summary>
     /// 鼠标设备名称
