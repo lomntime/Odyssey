@@ -113,6 +113,15 @@ public class PlayerInputManager : MonoBehaviour
     public virtual bool JumpUpGet() => m_jump.WasReleasedThisFrame();
 
     public virtual bool CrouchAndCrawGet() => m_crouch.IsPressed();
+
+    /// <summary>
+    /// 临时锁定移动方向
+    /// </summary>
+    /// <param name="duration">锁定时长</param>
+    public virtual void LockMovementDirection(float duration = 0.25f)
+    {
+        m_movementDirectionUnlockTime = Time.time + duration;
+    }
     
     #endregion
 

@@ -32,10 +32,9 @@ public class CrouchPlayerState : PlayerState
                     entity.StateManager.Change<CrawlingPlayerState>();
                 }
             }
-            
             else if (entity.InputManager.JumpDownGet())
             {
-                
+                entity.Backflip(entity.StatsManager.CurrStats.m_backflipBackwardForce);
             }
         }
         else

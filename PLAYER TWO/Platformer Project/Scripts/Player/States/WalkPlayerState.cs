@@ -37,6 +37,10 @@ public class WalkPlayerState : PlayerState
                 entity.Accelerate(direction);
                 entity.FaceDirectionSmooth(direction);
             }
+            else
+            {
+                entity.StateManager.Change<BrakePlayerState>();
+            }
         }
         else
         {

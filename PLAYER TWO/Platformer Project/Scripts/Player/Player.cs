@@ -33,6 +33,15 @@ public class Player : Entity<Player>
     /// </summary>
     /// <param name="direction"></param>
     public virtual void CrawlingAccelerate(Vector3 direction) => Accelerate(direction, m_statsManager.CurrStats.m_crawlingTurningSpeed, m_statsManager.CurrStats.m_crawlingAcceleration, m_statsManager.CurrStats.m_crawlingTopSpeed);
+
+    /// <summary>
+    /// 在空翻动作中平移滑动玩家（后空翻参数）
+    /// </summary>
+    public virtual void BackflipAcceleration()
+    {
+        var direction = m_inputManager.MovementCameraDirectionGet();
+        Accelerate(direction, StatsManager.CurrStats.m_backflipTurningDrag, StatsManager.CurrStats.m_backflipAirAcceleration, StatsManager.CurrStats.m_crawlingTurningSpeed);
+    }
     
     /// <summary>
     /// 平滑减速，使用减速度
@@ -92,6 +101,12 @@ public class Player : Entity<Player>
     /// 重置跳跃计数
     /// </summary>
     public virtual void ResetJumps() => m_jumpCounter = 0;
+    
+    /// <summary>
+    /// 设置跳跃次数
+    /// </summary>
+    /// <param name="amount"></param>
+    public virtual void SetJumps(int amount) => m_jumpCounter = amount;
     
     /// <summary>
     /// 下落逻辑
@@ -175,6 +190,21 @@ public class Player : Entity<Player>
     /// 是否能够站起
     /// </summary>
     public virtual bool CanStandUp() => !SphereCast(Vector3.up, OriginHeight);
+
+    /// <summary>
+    /// 后空翻
+    /// </summary>
+    /// <param name="force"></param>
+    public virtual void Backflip(float force)
+    {
+        if (StatsManager.CurrStats.m_canBackflip && !IsHolding)
+        {
+            VerticalVelocity = Vector3.up * StatsManager.CurrStats.m_backflipJumpHeight;
+            LateralVelocity = -transform.forward * force;
+            StateManager.Change<BackflipPlayerState>();
+            m_playerEvents.EventOnBackflip?.Invoke();
+        }
+    }
     
     #endregion    
     

@@ -2280,6 +2280,12 @@ MonoBehaviour:
   - HurtPlayerState
   - CrouchPlayerState
   - CrawlingPlayerState
+  - CrawlingPlayerState
+  - CrawlingPlayerState
+  - CrawlingPlayerState
+  - CrawlingPlayerState
+  - CrawlingPlayerState
+  - BackflipPlayerState
 --- !u!114 &9077142813939134806
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -53,4 +53,19 @@ public class PlayerStats : EntityStats<PlayerStats>
     public float m_crawlingFriction = 32f;       // 爬行摩擦力
     public float m_crawlingTopSpeed = 2.5f;      // 爬行最高速度
     public float m_crawlingTurningSpeed = 3f;    // 爬行转向速度
+    
+    //==============================【后空翻】==============================//
+    [Header("后空翻")]
+    public bool m_canBackflip = true;            // 是否能后空翻
+    public bool m_backflipLockMovement = true;   // 后空翻时是否锁定移动
+    public float m_backflipAirAcceleration = 12f;// 空中加速度
+    public float m_backflipTurningDrag = 2.5f;   // 转向阻力
+    public float m_backflipTopSpeed = 7.5f;      // 最高速度
+    public float m_backflipJumpHeight = 23f;     // 跳跃高度
+    public float m_backflipGravity = 35f;        // 重力
+    public float m_backflipBackwardForce = 4f;   // 向后推力
+    public float m_backflipBackwardTurnForce = 8f;// 向后转向力
+
+    
+    
 }
